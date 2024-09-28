@@ -175,5 +175,4 @@ async function getAllClasses() {
     await client.close();
   }
 }
-
-getAllClasses()
+// getAllClasses()
