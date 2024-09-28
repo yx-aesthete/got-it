@@ -130,3 +130,29 @@ async function getAllQuestions() {
   }
 }
 // getAllQuestions()
+
+async function incrementCurrentTopic(classId) {
+  try {
+    await client.connect();
+
+    const database = client.db('gotit'); // Replace with your database name
+    const classesCollection = database.collection('classes'); // Replace with your collection name
+
+    // Increment the cur_topic field by 1 for the specified class
+    const result = await classesCollection.updateOne(
+      { _id: new ObjectId(classId) }, // Match by class ID
+      { $inc: { cur_topic: 1 } }       // Increment cur_topic by 1
+    );
+
+    if (result.matchedCount > 0) {
+      console.log('cur_topic incremented successfully.');
+    } else {
+      console.log('Class not found.');
+    }
+  } catch (error) {
+    console.error('Error incrementing cur_topic:', error);
+  } finally {
+    await client.close();
+  }
+}
+// incrementCurrentTopic('66f83ab9bfef096374e15eea');
