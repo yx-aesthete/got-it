@@ -23,6 +23,10 @@ const highlightStyles = (props: TypographyContainerProps) => {
       return css`
         color: ${({ theme }) => theme.colors.whiteMidPrimary};
       `;
+    case 'salmon':
+      return css`
+        color: ${({ theme }) => theme.colors.salmonLight};
+      `;
     case 'inactive':
       return css`
         color: ${({ theme }) => theme.colors.whiteLight};

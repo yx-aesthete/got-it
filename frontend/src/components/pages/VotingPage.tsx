@@ -1,30 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { styled } from "styled-components";
 import gsap from "gsap";
 import Typography from "../atoms/typography/Typography";
-import { HighlightLevel, TypographyVariant } from "../atoms/typography/Typography.autogen";
+import {
+  HighlightLevel,
+  TypographyVariant,
+} from "../atoms/typography/Typography.autogen";
 
 // Questions array
 export const Questions = [
   { id: 0, content: "U got it?" },
   { id: 1, content: "U like it?" },
-  { id: 2, content: "U need it?" }, // Unique IDs for each question
+  { id: 2, content: "U like it?" },
 ];
+
+// Styling for the header
+const Header = styled.div`
+  width: 100%;
+  height: 180px; /* Fixed height for the header */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  position: absolute; /* Make it positioned absolutely at the top */
+  top: 0;
+  left: 0;
+  z-index: 1; /* Lower z-index to stay under the tiles */
+`;
 
 // Styling for the voting page wrapper
 const VotingPageWrapper = styled.div`
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: repeat(${Questions.length}, auto);
+  grid-template-columns: repeat(10, 1fr); /* 10 equal columns */
   gap: 3px; /* 3px gap between both columns and rows */
+  position: relative; /* Position relative for absolutely positioned elements inside */
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  padding-top: 180px; /* Add padding to start tiles below the header */
+  height: calc(100vh - 180px); /* Full height minus the header */
 `;
 
 // Styling for each voting cell
 const Cell = styled.div<{ isActive: boolean }>`
-  width: 10vw;
+  width: 10vw; /* Full width divided into 10 columns */
   height: calc(
-    90vh / ${Questions.length}
-  ); /* Height is 1/amount of questions */
+    (100vh - 180px) / ${Questions.length}
+  ); /* Distribute the remaining height among rows */
   background-color: ${(props) =>
     props.isActive
       ? props.theme.colors.purpleLight
@@ -36,20 +58,24 @@ const Cell = styled.div<{ isActive: boolean }>`
   cursor: pointer;
   color: white;
   position: relative;
+  z-index: 5; /* Higher z-index to appear above the labels */
 `;
 
 // Styling for the question labels
-const QuestionLabel = styled.div`
-  grid-column: 1 / -1; /* Span across all columns */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const QuestionLabel = styled.div<{ rowIndex: number }>`
+  position: absolute; /* Position the labels absolutely */
+  left: 0; /* Align to the left of the container */
+  top: ${(props) =>
+    props.rowIndex *
+    (80 / Questions.length)}%; /* Adjust top based on row index */
+  z-index: 10; /* Higher z-index to appear above the cells */
   font-size: 18px;
   color: ${(props) => props.theme.colors.purpleDark};
-  position: absolute; /* Make the label overlap the cells */
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* Allow clicks to pass through the label to cells */
+  pointer-events: none; /* Allow clicks to pass through to cells */
+  display: flex;
+  align-items: center; /* Center the text vertically */
+  padding-left: 5px; /* Optional: Add padding to adjust text position */
+  margin-top: 180px;
 `;
 
 export default function VotingPage() {
@@ -73,33 +99,52 @@ export default function VotingPage() {
     });
   };
 
-  return (
-    <VotingPageWrapper>
-      {Questions.map((question, questionIndex) => (
-        <React.Fragment key={question.id}>
-          {/* Render the question label */}
-          <QuestionLabel>
-            <Typography
-              animated
-              animationType="fade"
-              variant={TypographyVariant.bigHeader}
-              highlight_level={HighlightLevel.active}
-            >
-              {question.content}
-            </Typography>
-          </QuestionLabel>
+  useEffect(() => {
+    // Set CSS variable for name area height
+    document.documentElement.style.setProperty("--name-area-height", "180px");
+  }, []);
 
-          {/* Render 10 cells for each question */}
-          {[...Array(10)].map((_, cellIndex) => (
-            <Cell
-              key={cellIndex}
-              isActive={cellIndex < activeCells[questionIndex]}
-              className={`cell-${questionIndex}`}
-              onClick={() => handleCellClick(questionIndex, cellIndex)}
-            />
-          ))}
-        </React.Fragment>
-      ))}
-    </VotingPageWrapper>
+  return (
+    <>
+      <Header>
+        <Typography
+          animated
+          animationType="fade"
+          variant={TypographyVariant.megaSubHeader}
+          highlight_level={HighlightLevel.neutral}
+        >
+          Pool Name
+        </Typography>
+      </Header>
+
+      {/* Voting Page Grid */}
+      <VotingPageWrapper>
+        {Questions.map((question, questionIndex) => (
+          <React.Fragment key={question.id}>
+            {/* Render the question label */}
+            <QuestionLabel rowIndex={questionIndex}>
+              <Typography
+                animated
+                animationType="fade"
+                variant={TypographyVariant.bigHeader}
+                highlight_level={HighlightLevel.active}
+              >
+                {question.content}
+              </Typography>
+            </QuestionLabel>
+
+            {/* Render 10 cells for each question */}
+            {[...Array(10)].map((_, cellIndex) => (
+              <Cell
+                key={cellIndex}
+                isActive={cellIndex < activeCells[questionIndex]}
+                className={`cell-${questionIndex}`}
+                onClick={() => handleCellClick(questionIndex, cellIndex)}
+              />
+            ))}
+          </React.Fragment>
+        ))}
+      </VotingPageWrapper>
+    </>
   );
 }

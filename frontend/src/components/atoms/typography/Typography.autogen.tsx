@@ -1,7 +1,7 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
 const baseTypographyStyles = css`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 `;
 
 // source of truth for typography styles
@@ -46,10 +46,10 @@ export const typographyStyles = {
     }
   `,
   megaSubHeader: css`
-    font-family: 'Raleway', sans-serif;
-    font-size: 60px;
-    line-height: 56px;
-    font-weight: 700;
+    font-family: "Raleway", sans-serif;
+    font-size: 80px;
+    line-height: 92px;
+    font-weight: 300;
     margin-block-end: 10px;
     box-sizing: border-box;
     display: block;
@@ -65,7 +65,7 @@ export const typographyStyles = {
     }
   `,
   technical: css`
-    font-family: 'Raleway', sans-serif;
+    font-family: "Raleway", sans-serif;
     font-size: 28px;
     font-weight: 100;
     line-height: 22px;
@@ -93,20 +93,20 @@ export const typographyStyles = {
 
     @media (max-height: 800px) {
       font-size: 20px;
-      line-height: 24px;  
+      line-height: 24px;
     }
   `,
   bigHeader: css`
     ${baseTypographyStyles}
-    font-size: 32px;
-    line-height: 36px;
+    font-size: 120px;
+    line-height: 132px;
     font-weight: 500;
 
     @media (max-width: 768px) {
-      font-size: 32px;
-      line-height: 36px;
+      font-size: 100px;
+      line-height: 112px;
       font-weight: 500;
-    } 
+    }
 
     @media (max-height: 800px) {
       font-size: 32px;
@@ -115,7 +115,7 @@ export const typographyStyles = {
     }
   `,
   sectionAcronymHugeHeader: css`
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Montserrat", sans-serif;
     font-size: 46px;
     line-height: 50px;
     font-weight: 300;
@@ -229,27 +229,28 @@ export const typographyStyles = {
 };
 
 export enum TypographyVariant {
-  supermicro = 'supermicro',
-  micro = 'micro',
-  megaHeader = 'megaHeader',
-  megaSubHeader = 'megaSubHeader',
-  technical = 'technical',
-  sectionHeader = 'sectionHeader',
-  bigHeader = 'bigHeader',
-  sectionAcronymHugeHeader = 'sectionAcronymHugeHeader',
-  sectionSubHeaderSmallThin = 'sectionSubHeaderSmallThin',
-  sectionSubHeaderExtraSmallThin = 'sectionSubHeaderExtraSmallThin',
-  sectionSubHeaderSmallThick = 'sectionSubHeaderSmallThick',
-  sectionHeaderThin = 'sectionHeaderThin',
-  sectionSubHeader = 'sectionSubHeader',
-  sectionDescription = 'sectionDescription',
+  supermicro = "supermicro",
+  micro = "micro",
+  megaHeader = "megaHeader",
+  megaSubHeader = "megaSubHeader",
+  technical = "technical",
+  sectionHeader = "sectionHeader",
+  bigHeader = "bigHeader",
+  sectionAcronymHugeHeader = "sectionAcronymHugeHeader",
+  sectionSubHeaderSmallThin = "sectionSubHeaderSmallThin",
+  sectionSubHeaderExtraSmallThin = "sectionSubHeaderExtraSmallThin",
+  sectionSubHeaderSmallThick = "sectionSubHeaderSmallThick",
+  sectionHeaderThin = "sectionHeaderThin",
+  sectionSubHeader = "sectionSubHeader",
+  sectionDescription = "sectionDescription",
 }
 
 export enum HighlightLevel {
-  active = 'active',
-  menuActive = 'menuActive',
-  highlighted = 'highlighted',
-  inactive = 'inactive',
-  neutral = 'neutral',
-  warning = 'warning',
+  active = "active",
+  menuActive = "menuActive",
+  highlighted = "highlighted",
+  inactive = "inactive",
+  neutral = "neutral",
+  salmon = "salmon",
+  warning = "warning",
 }
