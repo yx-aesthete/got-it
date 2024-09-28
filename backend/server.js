@@ -156,3 +156,24 @@ async function incrementCurrentTopic(classId) {
   }
 }
 // incrementCurrentTopic('66f83ab9bfef096374e15eea');
+
+
+async function getAllClasses() {
+  try {
+    await client.connect();
+
+    const database = client.db('gotit'); // Replace with your database name
+    const classesCollection = database.collection('classes'); // Replace with your collection name
+
+    const classObjects = await classesCollection.find({}).toArray();
+    console.log(classObjects);
+    return classObjects;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await client.close();
+  }
+}
+
+getAllClasses()
