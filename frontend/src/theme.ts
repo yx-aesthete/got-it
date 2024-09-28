@@ -21,7 +21,7 @@ const theme: Theme = {
     pinkLight: "#dc4a6c",
     salmonDark: "#ff9294",
     salmonLight: "#F6B4B0FF",
-    purpleLight: "#9378a3",
+    purpleLight: "#D5B5E7FF",
     purpleMid: "#423358",
     purpleDark: "#45294f",
     purpleBlack: "#151319",
