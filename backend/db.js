@@ -177,7 +177,7 @@ async function getAllClasses() {
 }
 // getAllClasses()
 
-async function startListeningForClassChanges() {
+async function startListeningForClassChanges(io) {
   const client = await MongoClient.connect(uri);
   console.log("Connected to MongoDB");
 

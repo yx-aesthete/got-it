@@ -1,10 +1,10 @@
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 
 // Connect to the WebSocket server
 const socket = io("http://localhost:8080"); // Adjust the URL if needed
 
 // Example classId to join (replace with actual class ID from your database)
-const classId = "YOUR_CLASS_ID_HERE";
+const classId = "66f83ab9bfef096374e15eea";
 
 // Join the class room to get real-time updates
 socket.emit("joinClass", { classId });
