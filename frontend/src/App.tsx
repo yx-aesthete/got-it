@@ -5,6 +5,7 @@ import ClassList from "./components/pages/classesList/ClassList";
 import { GlobalWrapper } from "./App.styles";
 import ClassContainer from "./components/organisms/ClassContainer";
 import { listOfClasses } from "./components/pages/classesList/ClassList.mock";
+import { ClassProvider } from "./contexts/ClassContext";
 
 function App() {
   //TODO  move to context but here for now
@@ -26,10 +27,12 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <GlobalWrapper>
-        <ClassList />
-        <ClassContainer isPresenting={isAnyClassActive} />
-      </GlobalWrapper>
+      <ClassProvider>
+        <GlobalWrapper>
+          <ClassList />
+          <ClassContainer />
+        </GlobalWrapper>
+      </ClassProvider>
     </ThemeProvider>
   );
 }

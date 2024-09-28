@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import ClassEntity from "../../organisms/ClassEntity";
 import { listOfClasses } from "./ClassList.mock";
+import { useClassContext } from "../../../hooks/useClassContext";
 
 const ClassListWrapper = styled.div`
   width: 33vw;
@@ -17,10 +18,7 @@ const ClassListWrapper = styled.div`
 `;
 
 export default function ClassList() {
-
-
-  const [activeClass, setActiveClass] = React.useState<string>('');
-
+  const { activeClass, setActiveClass } = useClassContext();
 
   return (
     <ClassListWrapper>

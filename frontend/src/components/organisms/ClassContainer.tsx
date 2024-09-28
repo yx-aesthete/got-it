@@ -1,6 +1,7 @@
 import React from "react";
-import { IoMdPause, IoMdPlay } from "react-icons/io";
 import { styled } from "styled-components";
+import ControlIcons from "../molecules/ControllIcons";
+import { useClassContext } from "../../hooks/useClassContext";
 
 const ClassContainerWrapper = styled.div`
   width: 66vw;
@@ -11,37 +12,21 @@ const ClassContainerWrapper = styled.div`
   gap: 12px;
 `;
 
-const IconContainer = styled.div`
-  color: ${(props) => props.theme.colors.purpleLight};
-  &:hover {
-    cursor: pointer;
-    color: white !important;
-    transition: color 0.3s ease-in-out;
-  }
+export default function ClassContainer() {
+  // Destructure values returned from useClassContext
+  const { activeClass, isPresenting, isEditing, handlePresent, handleEdit } =
+    useClassContext();
 
-  > svg {
-    width: 80px;
-    height: 80px;
-  }
-`;
-
-const IconWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-export default function ClassContainer({
-  isPresenting,
-}: {
-  isPresenting: boolean;
-}) {
   return (
     <ClassContainerWrapper>
-      <IconWrapper>
-        <IconContainer>
-          {isPresenting ? <IoMdPause /> : <IoMdPlay />}
-        </IconContainer>
-      </IconWrapper>
+      <ControlIcons
+        isPresenting={isPresenting}
+        isEditing={isEditing}
+        isSharing={false}
+        handlePresenting={() => handlePresent()}
+        handleEditing={() => handleEdit()}
+        handleSharing={() => {}}
+      />
       ClassContainer
     </ClassContainerWrapper>
   );
