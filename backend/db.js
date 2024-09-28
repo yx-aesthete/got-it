@@ -29,7 +29,7 @@ async function addQuestionByIdToTopic(className, topicName, questionId) {
 
     const questionObject = {
       questionId: questionId,
-      answers: [0, 0, 0, 0, 0], // List of 5 integers
+      answers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // List of 10 integers
     };
 
     // Update the topics collection by adding the question ID to the questions array
@@ -213,6 +213,62 @@ async function startListeningForClassChanges() {
   console.log("Started watching changes for cur_topic in MongoDB");
 }
 
+
+async function addTopicToClass(className, topicName) {
+  try {
+    await client.connect();
+
+    const database = client.db('gotit'); // Replace with your database name
+    const classesCollection = database.collection('classes'); // Replace with your collection name
+
+    const newTopic = {
+      topic_name: topicName,
+      questions: []
+    };
+
+    const result = await classesCollection.updateOne(
+      { class_name: className },
+      { $push: { topics: newTopic } }
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(`Class with name ${className} not found`);
+    }
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await client.close();
+  }
+}
+
+async function createClass(className) {
+  try {
+    await client.connect();
+
+    const database = client.db('gotit'); // Replace with your database name
+    const classesCollection = database.collection('classes'); // Replace with your collection name
+
+    const newClass = {
+      class_name: className,
+      topics: [],
+      cur_topic: 0
+    };
+
+    const result = await classesCollection.insertOne(newClass);
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await client.close();
+  }
+}
+
+
 export {
   addQuestionByIdToTopic,
   voteOnQuestion,
@@ -220,4 +276,6 @@ export {
   incrementCurrentTopicInDatabase,
   getAllClasses,
   startListeningForClassChanges,
+  addTopicToClass,
+  createClass,
 };
