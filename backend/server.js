@@ -57,3 +57,48 @@ async function addQuestionToTopic(className, topicName, questionText) {
       await client.close();
   }
 }
+
+async function voteOnQuestion(className, topicName, questionText, answerIndex) {
+  if (answerIndex < 0 || answerIndex > 4) {
+    console.log('Invalid answer index. It must be between 0 and 4.');
+    return;
+  }
+
+  try {
+    await client.connect();
+
+    const database = client.db('gotit'); // Replace with your database name
+    const collection = database.collection('classes'); // Replace with your collection name
+
+    const result = await collection.updateOne(
+      {
+        class_name: className,
+        'topics.topic_name': topicName,
+        'topics.questions.question': questionText
+      },
+      {
+        $inc: { [`topics.$[topic].questions.$[question].answers.${answerIndex}`]: 1 }
+      },
+      {
+        arrayFilters: [
+          { 'topic.topic_name': topicName }, 
+          { 'question.question': questionText }
+        ]
+      }
+    );
+
+    if (result.matchedCount > 0) {
+      console.log(`Vote added successfully to answer index ${answerIndex}.`);
+    } else {
+      console.log('Class, topic, or question not found.');
+    }
+  } catch (error) {
+    console.error('Error voting on question:', error);
+  } finally {
+    await client.close();
+  }
+}
+
+// Example usage:
+// addQuestionToTopic('Mathematics', 'Calculus', 'What is the derivative of sin(x)?');
+// voteOnQuestion('Mathematics', 'Calculus', 'What is the derivative of sin(x)?', 2);
