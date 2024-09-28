@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* background-image: url('./assets/background/backgroundImageDesktop.png'); */
+  background-size: cover;
+  background-position: left center;
+  /* background-color: #0a0a0a; */
+  z-index: -1; /* Ensure the background is behind other content */
+}
+
+/* @media (max-width: 768px) {
+  body::before {
+    background-image: url('./assets/background/backgroundImageMobile.png');
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  body::before {
+    background-image: url('./assets/background/reduced/backgroundImageDesktopReduced.png');
+  }
+} */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
