@@ -218,6 +218,3 @@ async function watchCurTopicForClass(classId) {
 }
 
 // watchCurTopicForClass('66f83ab9bfef096374e15eea'); // Replace with the classId you want to follow
-
-
-jest juz funkcja zmieniajaca cur_topic
