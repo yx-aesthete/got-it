@@ -17,25 +17,20 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  console.log("🚀 ~ isEditing:", isEditing)
   const [isPresenting, setIsPresenting] = useState(false);
-  console.log("🚀 ~ isPresenting:", isPresenting)
   const [activeClass, setActiveClass] = useState<string | null>(null);
-  console.log("🚀 ~ activeClass:", activeClass)
 
   // Function to handle editing the active class
   const handleEdit = () => {
-    if (activeClass) {
-      setIsEditing(true);
-      setIsPresenting(false);
+    if (activeClass && !isPresenting) {
+      setIsEditing((prev) => !prev);
     }
   };
 
-  // Function to handle presenting the active class
+  // Function to toggle presenting the active class
   const handlePresent = () => {
-    if (activeClass) {
-      setIsPresenting(true);
-      setIsEditing(false);
+    if (activeClass && !isEditing) {
+      setIsPresenting((prev) => !prev);
     }
   };
 

@@ -19,14 +19,16 @@ export default function ClassContainer() {
 
   return (
     <ClassContainerWrapper>
-      <ControlIcons
-        isPresenting={isPresenting}
-        isEditing={isEditing}
-        isSharing={false}
-        handlePresenting={() => handlePresent()}
-        handleEditing={() => handleEdit()}
-        handleSharing={() => {}}
-      />
+      {activeClass &&
+        <ControlIcons
+          isPresenting={isPresenting}
+          isEditing={isEditing}
+          isSharing={false}
+          handlePresenting={() => handlePresent()}
+          handleEditing={() => handleEdit()}
+          handleSharing={() => { }}
+        />
+      }
       ClassContainer
     </ClassContainerWrapper>
   );

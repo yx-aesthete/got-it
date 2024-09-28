@@ -1,38 +1,42 @@
 import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import theme from "./theme";
 import { ThemeProvider } from "styled-components";
-import ClassList from "./components/pages/classesList/ClassList";
 import { GlobalWrapper } from "./App.styles";
-import ClassContainer from "./components/organisms/ClassContainer";
-import { listOfClasses } from "./components/pages/classesList/ClassList.mock";
+import { listOfClasses } from "./components/organisms/classesList/ClassList.mock"; // Ensure this path is correct
 import { ClassProvider } from "./contexts/ClassContext";
+import VotingPage from "./components/pages/VotingPage";
+import Classes from "./components/pages/classes/Classes";
 
 function App() {
-  //TODO  move to context but here for now
+  // TODO: Move to context but here for now
   const [isPresenting, setIsPresenting] = React.useState<string | null>(null);
   console.log("🚀 ~ App ~ isPresenting:", isPresenting);
 
   React.useEffect(() => {
-    const activeClass = listOfClasses.find((classItem) => classItem.isActive);
+    const activeClass = listOfClasses.find(
+      (classItem: any) => classItem.isActive
+    );
     if (activeClass) {
       setIsPresenting(activeClass.name);
     } else {
-      setIsPresenting("");
+      setIsPresenting(null);
     }
   }, []);
 
-  const isAnyClassActive = listOfClasses.some(
-    (classItem) => classItem.isActive
-  );
-
   return (
     <ThemeProvider theme={theme}>
-      <ClassProvider>
-        <GlobalWrapper>
-          <ClassList />
-          <ClassContainer />
-        </GlobalWrapper>
-      </ClassProvider>
+      <Router>
+        <ClassProvider>
+          <GlobalWrapper>
+            <Routes>
+              <Route path="/vote" element={<VotingPage />} />
+              <Route path="/classes" element={<Classes />} />
+              <Route path="/" element={<VotingPage />} />
+            </Routes>
+          </GlobalWrapper>
+        </ClassProvider>
+      </Router>
     </ThemeProvider>
   );
 }

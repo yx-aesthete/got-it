@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "styled-components";
-import ClassEntity from "../../organisms/ClassEntity";
+import ClassEntity from "../ClassEntity";
 import { listOfClasses } from "./ClassList.mock";
 import { useClassContext } from "../../../hooks/useClassContext";
 
