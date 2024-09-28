@@ -1,7 +1,14 @@
 import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
+import { Server } from 'socket.io';
+import express from 'express';
+import http from 'http';
 
 dotenv.config();
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
 const uri = process.env.CONNECT_STRING;
 
@@ -155,6 +162,11 @@ async function incrementCurrentTopic(classId) {
     await client.close();
   }
 }
+
+
+
+
+
 // incrementCurrentTopic('66f83ab9bfef096374e15eea');
 
 
@@ -176,3 +188,36 @@ async function getAllClasses() {
   }
 }
 // getAllClasses()
+
+async function watchCurTopicForClass(classId) {
+  try {
+    await client.connect();
+    const database = client.db('gotit'); // Replace with your database name
+    const classesCollection = database.collection('classes'); // Replace with your collection name
+
+    // Watch for changes in the "cur_topic" field for a specific class ID
+    const changeStream = classesCollection.watch([
+      {
+        $match: {
+          'documentKey._id': new ObjectId(classId), // Only follow changes for the specific class ID
+          'updateDescription.updatedFields.cur_topic': { $exists: true }
+        }
+      }
+    ]);
+
+    changeStream.on('change', (change) => {
+      console.log('Change detected for class ID:', classId);
+      const newCurTopic = change.updateDescription.updatedFields.cur_topic;
+
+      // Emit the cur_topic change to connected clients
+      io.emit('curTopicChanged', { classId: classId, newCurTopic });
+    });
+  } catch (error) {
+    console.error('Error watching cur_topic changes for class:', error);
+  }
+}
+
+// watchCurTopicForClass('66f83ab9bfef096374e15eea'); // Replace with the classId you want to follow
+
+
+jest juz funkcja zmieniajaca cur_topic
