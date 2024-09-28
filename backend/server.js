@@ -1,178 +1,156 @@
-import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
-import dotenv from 'dotenv';
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import { MongoClient, ObjectId } from "mongodb";
+import {
+  incrementCurrentTopicInDatabase,
+  addQuestionByIdToTopic,
+  getAllClasses,
+  getAllQuestions,
+  startListeningForClassChanges,
+  voteOnQuestion,
+} from "./db.js";
 
-dotenv.config();
+const app = express();
+const server = http.createServer(app);
 
-const uri = process.env.CONNECT_STRING;
+app.use(express.json());
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Allow all origins for CORS
+    methods: ["GET", "POST"],
+  },
+});
 
-if (!uri) {
-  throw new Error("MongoDB connection string is not defined in environment variables");
-}
+server.listen(8080, () => {
+  console.log("Server is running on http://localhost:8080");
+});
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
+startListeningForClassChanges(io);
+console.log("LOL");
+
+app.post("/incrementCurrentTopic", (req, res) => {
+  const classId = req.body.classId;
+
+  incrementCurrentTopicInDatabase(classId)
+    .then((newTopicIndex) => {
+      // Emit WebSocket event to students in this class
+      io.to(`class_${classId}`).emit("topicUpdated", { newTopicIndex });
+
+      res.status(200).send({ success: true, newTopicIndex });
+    })
+    .catch((err) => {
+      res.status(500).send({ success: false, error: err.message });
+    });
+});
+
+app.post("/addQuestionByIdToTopic", async (req, res) => {
+  const { className, topicName, questionId } = req.body;
+
+  // Basic validation
+  if (!className || !topicName || !questionId) {
+    return res
+      .status(400)
+      .json({ error: "className, topicName, and questionId are required" });
+  }
+
+  try {
+    // Call your existing addQuestionByIdToTopic function
+    await addQuestionByIdToTopic(className, topicName, questionId);
+
+    // Respond with success
+    res.status(200).json({
+      success: true,
+      message: `Question added to topic ${topicName} in class ${className}`,
+    });
+  } catch (error) {
+    console.error("Error adding question to topic:", error);
+    res.status(500).json({ error: "Failed to add question to topic" });
   }
 });
 
-// Function to add a question to a topic
-async function addQuestionByIdToTopic(className, topicName, questionId) {
+// Assuming you have Express, MongoClient, and other required dependencies already set up as in the previous code
+
+// Implement the endpoint for getting all questions
+app.get("/getAllQuestions", async (req, res) => {
   try {
-    await client.connect();
+    // Call the function that retrieves all questions from the database
+    const questions = await getAllQuestions();
+    // Send the questions back as JSON
+    res.status(200).json(questions);
+  } catch (error) {
+    console.error("Error fetching all questions:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch questions" });
+  }
+});
 
-    const database = client.db('gotit'); // Replace with your database name
-    const topicsCollection = database.collection('classes'); // Replace with your collection name
+// Implement the endpoint for getting all classes
+app.get("/getAllClasses", async (req, res) => {
+  try {
+    // Call the function that retrieves all classes from the database
+    const classes = await getAllClasses();
+    // Send the classes back as JSON
+    res.status(200).json(classes);
+  } catch (error) {
+    console.error("Error fetching all classes:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch classes" });
+  }
+});
 
-    const questionObject = {
-      questionId: questionId,
-      answers: [0, 0, 0, 0, 0]  // List of 5 integers
-      };
+io.on("connection", (socket) => {
+  console.log("A client connected");
 
-    // Update the topics collection by adding the question ID to the questions array
-    const result = await topicsCollection.updateOne(
-      {
-        class_name: className,
-        'topics.topic_name': topicName
-      },
-      {
-        $push: { 'topics.$.questions': questionObject }
-      }
-    );
+  // When a student joins a class, join them to a room
+  socket.on("joinClass", async (data) => {
+    const { classId } = data;
+    socket.join(`class_${classId}`);
+    console.log(`Client joined class with ID: ${classId}`);
 
-    if (result.matchedCount > 0) {
-      console.log('Question ID added to the topic successfully.');
-    } else {
-      console.log('Class or topic not found.');
+    // Send the current topic to the newly connected client
+    const uri = process.env.CONNECT_STRING;
+    const client = await MongoClient.connect(uri);
+    console.log("Connected to MongoDB");
+
+    // Initialize database and collections
+    const db = client.db("gotit");
+    const classesCollection = db.collection("classes");
+    const classDoc = await classesCollection.findOne({
+      _id: new ObjectId(classId),
+    });
+    if (classDoc) {
+      socket.emit("currentTopic", { currentTopic: classDoc.cur_topic });
     }
-  } catch (error) {
-    console.error('Error adding question by ID to topic:', error);
-  } finally {
     await client.close();
-  }
-}
-// addQuestionByIdToTopic('Mathematics', 'Calculus', new ObjectId('66f839bdbfef096374e15ee0'));
+  });
 
+  // Handle student voting
+  socket.on("voteOnQuestion", async (data) => {
+    const { className, topicName, questionId, answerIndex } = data;
 
-// Function to vote on a specific question by its ObjectId
-async function voteOnQuestion(className, topicName, questionId, answerIndex) {
-  if (answerIndex < 0 || answerIndex > 4) {
-    console.log('Invalid answer index. It must be between 0 and 4.');
-    return;
-  }
+    try {
+      // Call your existing voteOnQuestion function to handle the vote
+      await voteOnQuestion(className, topicName, questionId, answerIndex);
+      console.log(
+        `Vote recorded: class=${className}, topic=${topicName}, question=${questionId}, answer=${answerIndex}`
+      );
 
-  try {
-    await client.connect();
+      // Optionally, you can emit an acknowledgment to the student
+      socket.emit("voteAcknowledged", { success: true });
 
-    const database = client.db('gotit'); // Replace with your database name
-    const topicsCollection = database.collection('classes'); // Replace with your collection name
-
-    // Use dynamic field name in the update operation
-    const updateField = `topics.$[topic].questions.$[question].answers.${answerIndex}`;
-
-    // Update the specific answer in the answers array for the question with the given questionId
-    const result = await topicsCollection.updateOne(
-      {
-        class_name: className,
-        'topics.topic_name': topicName,
-        'topics.questions.questionId': new ObjectId(questionId) // Match the question by its ID
-      },
-      {
-        $inc: { [updateField]: 1 } // Use bracket notation for dynamic field name
-      },
-      {
-        arrayFilters: [
-          { 'topic.topic_name': topicName },  // Filter for the correct topic
-          { 'question.questionId': new ObjectId(questionId) }  // Filter for the correct question by ID
-        ]
-      }
-    );
-
-    if (result.matchedCount > 0) {
-      console.log(`Vote added successfully to answer index ${answerIndex}.`);
-    } else {
-      console.log('Class, topic, or question not found.');
+      // You might also want to broadcast the updated vote count or results to all students in the class
+      // io.to(`class_${classId}`).emit("voteUpdate", { ...updatedVoteData });
+    } catch (error) {
+      console.error("Error recording vote:", error);
+      socket.emit("voteAcknowledged", { success: false, error: error.message });
     }
-  } catch (error) {
-    console.error('Error voting on question:', error);
-  } finally {
-    await client.close();
-  }
-}
-// voteOnQuestion('Mathematics', 'Calculus', '66f839bdbfef096374e15ee0', 2);
+  });
 
-
-
-async function getAllQuestions() {
-  try {
-    await client.connect();
-
-    const database = client.db('gotit'); // Replace with your database name
-    const collection = database.collection('questions'); // Replace with your collection name
-
-    // Fetch all questions from the collection
-    const questions = await collection.find({}, { projection: { _id: 1, question: 1 } }).toArray();
-
-    if (questions.length > 0) {
-      console.log('Questions found:', questions);
-    } else {
-      console.log('No questions found.');
-    }
-
-    return questions; // Return the array of questions
-  } catch (error) {
-    console.error('Error retrieving questions:', error);
-    return [];
-  } finally {
-    await client.close();
-  }
-}
-// getAllQuestions()
-
-async function incrementCurrentTopic(classId) {
-  try {
-    await client.connect();
-
-    const database = client.db('gotit'); // Replace with your database name
-    const classesCollection = database.collection('classes'); // Replace with your collection name
-
-    // Increment the cur_topic field by 1 for the specified class
-    const result = await classesCollection.updateOne(
-      { _id: new ObjectId(classId) }, // Match by class ID
-      { $inc: { cur_topic: 1 } }       // Increment cur_topic by 1
-    );
-
-    if (result.matchedCount > 0) {
-      console.log('cur_topic incremented successfully.');
-    } else {
-      console.log('Class not found.');
-    }
-  } catch (error) {
-    console.error('Error incrementing cur_topic:', error);
-  } finally {
-    await client.close();
-  }
-}
-// incrementCurrentTopic('66f83ab9bfef096374e15eea');
-
-
-async function getAllClasses() {
-  try {
-    await client.connect();
-
-    const database = client.db('gotit'); // Replace with your database name
-    const classesCollection = database.collection('classes'); // Replace with your collection name
-
-    const classObjects = await classesCollection.find({}).toArray();
-    console.log(classObjects);
-    return classObjects;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  } finally {
-    await client.close();
-  }
-}
-// getAllClasses()
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("A client disconnected");
+  });
+});
