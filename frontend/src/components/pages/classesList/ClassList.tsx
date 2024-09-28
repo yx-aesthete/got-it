@@ -1,10 +1,11 @@
 import React from "react";
 import { styled } from "styled-components";
 import ClassEntity from "../../organisms/ClassEntity";
+import { listOfClasses } from "./ClassList.mock";
 
 const ClassListWrapper = styled.div`
   width: 33vw;
-  height: 100vh;
+  max-height: 100%;
   min-width: 300px;
   display: flex;
   flex-direction: column;
@@ -15,20 +16,12 @@ const ClassListWrapper = styled.div`
   filter: drop-shadow(3px 0px 12px #e029d19b);
 `;
 
-const listOfClasses = [
-  { id: 1, name: "Class 1", description: "Description 1" },
-  { id: 2, name: "Class 2", description: "Description 2" },
-  { id: 3, name: "Class 3", description: "Description 3" },
-  { id: 4, name: "Class 4", description: "Description 4" },
-  { id: 5, name: "Class 5", description: "Description 5" },
-  { id: 5, name: "Class 5", description: "Description 5" },
-  { id: 5, name: "Class 5", description: "Description 5" },
-  { id: 5, name: "Class 5", description: "Description 5" },
-  { id: 5, name: "Class 5", description: "Description 5" },
-  { id: 5, name: "Class 5", description: "Description 5" },
-];
-
 export default function ClassList() {
+
+
+  const [activeClass, setActiveClass] = React.useState<string>('');
+
+
   return (
     <ClassListWrapper>
       {listOfClasses.map((classItem) => (
@@ -36,6 +29,8 @@ export default function ClassList() {
           key={classItem.id}
           name={classItem.name}
           description={classItem.description}
+          isActive={activeClass === classItem.name}
+          onClick={() => setActiveClass(classItem.name)}
         />
       ))}
     </ClassListWrapper>

@@ -15,6 +15,10 @@ const highlightStyles = (props: TypographyContainerProps) => {
       return css`
         color: ${({ theme }) => theme.colors.whitePrimary};
       `;
+    case 'menuActive':
+      return css`
+        color: ${({ theme }) => theme.colors.purpleBlack};
+      `;
     case 'highlighted':
       return css`
         color: ${({ theme }) => theme.colors.whiteMidPrimary};

@@ -247,6 +247,7 @@ export enum TypographyVariant {
 
 export enum HighlightLevel {
   active = 'active',
+  menuActive = 'menuActive',
   highlighted = 'highlighted',
   inactive = 'inactive',
   neutral = 'neutral',
