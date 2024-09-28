@@ -16,6 +16,19 @@ const theme: Theme = {
     warning: "#9F0A0AC4",
     accentGreen: "#65E09F",
 
+    // got-it palette
+    pinkDark: "#dc4a6c",
+    pinkLight: "#dc4a6c",
+    salmonDark: "#ff9294",
+    salmonLight: "#F6B4B0FF",
+    purpleLight: "#9378a3",
+    purpleMid: "#423358",
+    purpleDark: "#45294f",
+    purpleBlack: "#151319",
+
+    blueLight: "#6094FA",
+    redLight: "##FF675E",
+
     // Grey primary
     greyPrimary: "#D9D9D9",
     greyMidPrimary: "#D9D9D9B0",
@@ -58,6 +71,16 @@ type ThemeColors = {
   greyPrimary5: string;
   greyPrimary10: string;
   greyPrimary15: string;
+  pinkDark: string;
+  pinkLight: string;
+  salmonDark: string;
+  salmonLight: string;
+  purpleLight: string;
+  blueLight:string;
+  redLight:string;
+  purpleMid: string;
+  purpleDark: string;
+  purpleBlack: string;
   greyPrimary20: string;
   greyPrimary25: string;
   greyPrimary30: string;
