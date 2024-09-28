@@ -5,4 +5,6 @@ export const GlobalWrapper = styled.div`
   width: 100wv;
   background-color: ${(props) => props.theme.colors.purpleBlack};
   overflow: hidden;
+  display: flex;
+  
 `;
