@@ -177,7 +177,13 @@ async function getAllClasses() {
 }
 // getAllClasses()
 
-function startListeningForClassChanges() {
+async function startListeningForClassChanges() {
+  const client = await MongoClient.connect(uri);
+  console.log("Connected to MongoDB");
+
+  // Initialize database and collections
+  const db = client.db("gotit");
+  const classesCollection = db.collection("classes");
   const changeStream = classesCollection.watch([
     {
       $match: {
@@ -206,30 +212,6 @@ function startListeningForClassChanges() {
 
   console.log("Started watching changes for cur_topic in MongoDB");
 }
-async function initializeMongoAndStartServer() {
-  try {
-    const client = await MongoClient.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to MongoDB");
-
-    // Initialize database and collections
-    db = client.db(dbName);
-    classesCollection = db.collection("classes");
-    questionsCollection = db.collection("questions");
-
-    // Start listening for changes in classes collection
-    startListeningForClassChanges();
-
-    // Start the server after the connection is established
-    server.listen(8080, () => {
-      console.log("Server is running on http://localhost:8080");
-    });
-  } catch (err) {
-    console.error("MongoDB connection error:", err);
-  }
-}
 
 export {
   addQuestionByIdToTopic,
@@ -237,6 +219,5 @@ export {
   getAllQuestions,
   incrementCurrentTopicInDatabase,
   getAllClasses,
-  startChangeStreamListener,
-  initializeMongoAndStartServer,
+  startListeningForClassChanges,
 };

@@ -1,15 +1,23 @@
 import express from "express";
 import http from "http";
-import io from "socket.io";
-import { incrementCurrentTopicInDatabase, addQuestionByIdToTopic } from "./db";
+import { Server } from "socket.io";
+import {
+  incrementCurrentTopicInDatabase,
+  addQuestionByIdToTopic,
+  getAllClasses,
+  getAllQuestions,
+  startListeningForClassChanges,
+} from "./db.js";
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server);
 
 app.use(express.json());
-
-initializeMongoAndStartServer();
+server.listen(8080, () => {
+  console.log("Server is running on http://localhost:8080");
+});
+startListeningForClassChanges();
 
 app.post("/incrementCurrentTopic", (req, res) => {
   const classId = req.body.classId;
