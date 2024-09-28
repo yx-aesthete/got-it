@@ -102,3 +102,31 @@ async function voteOnQuestion(className, topicName, questionText, answerIndex) {
 // Example usage:
 // addQuestionToTopic('Mathematics', 'Calculus', 'What is the derivative of sin(x)?');
 // voteOnQuestion('Mathematics', 'Calculus', 'What is the derivative of sin(x)?', 2);
+
+async function getAllQuestions() {
+  try {
+    await client.connect();
+
+    const database = client.db('gotit'); // Replace with your database name
+    const collection = database.collection('questions'); // Replace with your collection name
+
+    // Fetch all questions from the collection
+    const questions = await collection.find({}, { projection: { _id: 1, question: 1 } }).toArray();
+
+    if (questions.length > 0) {
+      console.log('Questions found:', questions);
+    } else {
+      console.log('No questions found.');
+    }
+
+    return questions; // Return the array of questions
+  } catch (error) {
+    console.error('Error retrieving questions:', error);
+    return [];
+  } finally {
+    await client.close();
+  }
+}
+
+// Example usage:
+getAllQuestions()
