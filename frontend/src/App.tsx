@@ -8,6 +8,7 @@ import { ClassProvider } from "./contexts/ClassContext";
 import VotingPage from "./components/pages/VotingPage";
 import Classes from "./components/pages/classes/Classes";
 import { DataProvider } from "./contexts/DataContext";
+import KeynoteList from "./components/pages/keynote/Keynote";
 
 function App() {
   // TODO: Move to context but here for now

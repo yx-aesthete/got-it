@@ -9,8 +9,8 @@ export default function Classes() {
   
   return (
     <>
-      <ClassContainer />
       <ClassList classes={classes}/>
+      <ClassContainer />
     </>
   );
 }
