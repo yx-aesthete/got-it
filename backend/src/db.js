@@ -1,7 +1,7 @@
-dotenv.config();
 import dotenv from "dotenv";
 import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
+dotenv.config();
 const uri = process.env.CONNECT_STRING;
 
 if (!uri) {
@@ -57,9 +57,14 @@ async function addQuestionByIdToTopic(className, topicName, questionId) {
 // addQuestionByIdToTopic('Mathematics', 'Calculus', new ObjectId('66f839bdbfef096374e15ee0'));
 
 // Function to vote on a specific question by its ObjectId
-async function voteOnQuestion(className, topicName, questionId, answerIndex) {
+async function voteOnQuestion(className, topicName, questionId, answerIndex, userId) {
   if (answerIndex < 0 || answerIndex > 4) {
     console.log("Invalid answer index. It must be between 0 and 4.");
+    return;
+  }
+  // Validate userId
+  if (!ObjectId.isValid(userId)) {
+    console.log("Invalid userId. It must be a 24-character hex string.");
     return;
   }
 
@@ -68,6 +73,16 @@ async function voteOnQuestion(className, topicName, questionId, answerIndex) {
 
     const database = client.db("gotit"); // Replace with your database name
     const topicsCollection = database.collection("classes"); // Replace with your collection name
+    const usersCollection = database.collection("students"); // Replace with your users collection name
+    const questionsCollection = database.collection("questions"); // Replace with your questions collection name
+
+    const questionDoc = await questionsCollection.findOne({ _id: new ObjectId(questionId) });
+    if (!questionDoc) {
+      console.log("Question not found.");
+      return;
+    }
+    const questionText = questionDoc.question;
+
 
     // Use dynamic field name in the update operation
     const updateField = `topics.$[topic].questions.$[question].answers.${answerIndex}`;
@@ -92,6 +107,29 @@ async function voteOnQuestion(className, topicName, questionId, answerIndex) {
 
     if (result.matchedCount > 0) {
       console.log(`Vote added successfully to answer index ${answerIndex}.`);
+      
+      
+      const userUpdateResult = await usersCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        {
+          $push: {
+            answers: {
+              class_name: className,
+              question_id: questionText,
+              topic_name: topicName,
+              vote: answerIndex
+            }
+          }
+        }
+      );
+
+      if (userUpdateResult.matchedCount > 0) {
+        console.log("User's answers array updated successfully.");
+      } else {
+        console.log("User not found.");
+      }
+
+
     } else {
       console.log("Class, topic, or question not found.");
     }
@@ -101,7 +139,7 @@ async function voteOnQuestion(className, topicName, questionId, answerIndex) {
     await client.close();
   }
 }
-// voteOnQuestion('Mathematics', 'Calculus', '66f839bdbfef096374e15ee0', 2);
+// voteOnQuestion('Mathematics', 'Calculus', '66f839bdbfef096374e15ee0', 3, '66f886397dce0b4ff99562aa');
 
 async function getAllQuestions() {
   try {
@@ -214,7 +252,7 @@ async function startListeningForClassChanges(io) {
 }
 
 
-async function addTopicToClass(className, topicName) {
+async function addTopicToClass(className, topicName, topicDescription) {
   try {
     await client.connect();
 
@@ -223,7 +261,9 @@ async function addTopicToClass(className, topicName) {
 
     const newTopic = {
       topic_name: topicName,
-      questions: []
+      questions: [],
+      topic_description: topicDescription,
+      estimated_time_minutes: 0,
     };
 
     const result = await classesCollection.updateOne(
@@ -254,7 +294,9 @@ async function createClass(className) {
     const newClass = {
       class_name: className,
       topics: [],
-      cur_topic: 0
+      cur_topic: 0,
+      is_active: true,
+      description: '',
     };
 
     const result = await classesCollection.insertOne(newClass);
