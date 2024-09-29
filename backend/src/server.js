@@ -158,3 +158,44 @@ io.on("connection", (socket) => {
     console.log("A client disconnected");
   });
 });
+
+app.post("/start-voting", express.json(), async (req, res) => {
+  const { classId, topicName } = req.body;
+
+  if (!classId || !topicName) {
+    return res
+      .status(400)
+      .json({ error: "classId and topicName are required." });
+  }
+
+  try {
+    // Broadcast the startVoting signal to all clients in the class
+    io.to(`class_${classId}`).emit("startVoting", { topicName });
+    console.log(
+      `Lecturer started voting for class ${classId} on topic ${topicName}`
+    );
+    res.json({
+      success: true,
+      message: `Voting started for class ${classId} on topic ${topicName}`,
+    });
+  } catch (error) {
+    console.error("Error starting voting:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to start voting." });
+  }
+});
+
+app.get("/current-votes/:className", async (req, res) => {
+  const { className } = req.params;
+
+  try {
+    await withMongoDB(uri, "gotit", async (database) => {
+      const votesCollection = database.collection("votes");
+      const votes = await votesCollection.find({ className }).toArray();
+      res.json(votes);
+    });
+  } catch (error) {
+    res.status(500).send("Error fetching votes");
+  }
+});
