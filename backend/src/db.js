@@ -115,7 +115,7 @@ async function voteOnQuestion(className, topicName, questionId, answerIndex, use
           $push: {
             answers: {
               class_name: className,
-              question_id: questionText,
+              question: questionText,
               topic_name: topicName,
               vote: answerIndex
             }
