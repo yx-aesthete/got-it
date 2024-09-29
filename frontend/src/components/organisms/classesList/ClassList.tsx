@@ -29,6 +29,7 @@ interface ClassListProps {
 
 export default function ClassList({ classes }: ClassListProps) {
   const { activeClass, setActiveClassWrapper } = useClassContext();
+  
 
   return (
     <ClassListWrapper>

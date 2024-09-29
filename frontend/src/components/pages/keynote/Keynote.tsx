@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import KeynoteEntity from "../../organisms/KeynoteEntity";
 import { listOfKeynotes } from "./KeynoteList.mock";
+import { useClassContext } from "../../../contexts/ClassContext";
 
 const KeynoteContainer = styled.div`
   display: flex;
@@ -9,6 +10,22 @@ const KeynoteContainer = styled.div`
   width: 200px;
   height: 100%;
   justify-content: flex-start;
+`;
+
+const Loader = styled.div<{ height: number }>`
+  width: 100%;
+
+  height: ${(props) => props.height}px;
+  background-color: ${(props) => props.theme.colors.blueLight};
+  display: flex;
+  justify-content: flex-start;
+  width: 4px;
+`;
+
+const KeynoteWithProgress = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 100%;
 `;
 
 const KeynoteListWrapper = styled.div<{ isScrollable: boolean }>``;
@@ -23,9 +40,12 @@ const calculateHeight = (
 
 const calculateTotalTime = (listOfKeynotes: any[]) => {
   return listOfKeynotes.reduce(
-    (sum, keynote) => sum + keynote.timeEstimated,
-    0
+    
   );
+};
+
+const countHeightProgress = (timePassed: number, totalTime: number) => {
+  return (timePassed / totalTime) * 1000;
 };
 
 export default function KeynoteList() {
@@ -37,28 +57,53 @@ export default function KeynoteList() {
     keynoteWrapperRefHeight
   );
 
+  const [startTime, setStartTime] = React.useState<Date>();
+  const [timePassed, setTimePassed] = React.useState<number>(0);
+
+  const timeStarter = () => {
+    setStartTime(new Date());
+  };
+
+  const countTimeSinceStart = () => {
+    timeStarter();
+    setInterval(() => {
+      if (startTime) {
+        setTimePassed(new Date().getTime() - startTime.getTime());
+      }
+    }, 1000);
+  };
+
+  const { activeClass } = useClassContext();
+
+  useEffect(() => {
+    timeStarter();
+    countTimeSinceStart();
+  }, [activeClass]);
+
   const totalTime = calculateTotalTime(listOfKeynotes);
 
   const isScrollable = listOfKeynotes.length > 10;
 
   return (
-    <KeynoteContainer ref={keynoteWrapperRef}>
-      {listOfKeynotes.map((keynote, index) => {
-        return (
-          <KeynoteEntity
-            isodd={index % 2 === 0}
-            height={calculateHeight(
-              keynote.timeEstimated,
-              totalTime,
-              totalTime
-            )}
-            key={keynote.id}
-            title={keynote.title}
-            isActive={false}
-            index={index}
-          />
-        );
-      })}
-    </KeynoteContainer>
+    <KeynoteWithProgress>
+      <KeynoteContainer ref={keynoteWrapperRef}>
+        {listOfKeynotes.map((keynote, index) => (
+          <React.Fragment key={keynote.id}>
+            <KeynoteEntity
+              isodd={index % 2 === 0}
+              height={calculateHeight(
+                keynote.timeEstimated,
+                totalTime,
+                totalTime
+              )}
+              title={keynote.title}
+              isActive={false}
+              index={index}
+            />
+          </React.Fragment>
+        ))}
+      </KeynoteContainer>
+      <Loader height={countHeightProgress(timePassed, totalTime)} />
+    </KeynoteWithProgress>
   );
 }
