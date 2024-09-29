@@ -8,10 +8,13 @@ import {
   addQuestionByIdToTopic,
   getAllClasses,
   getAllQuestions,
-  startListeningForClassChanges,
   voteOnQuestion,
+  withMongoDB,
 } from "./db.js";
 
+const PORT = 8080;
+
+const uri = process.env.CONNECT_STRING;
 const app = express();
 const server = http.createServer(app);
 
@@ -30,11 +33,9 @@ const io = new Server(server, {
   },
 });
 
-server.listen(8080, () => {
+server.listen(PORT, () => {
   console.log("Server is running on http://localhost:8080");
 });
-
-startListeningForClassChanges(io);
 
 app.post("/incrementCurrentTopic", (req, res) => {
   const classId = req.body.classId;
@@ -118,20 +119,16 @@ io.on("connection", (socket) => {
     console.log(`Client joined class with ID: ${classId}`);
 
     // Send the current topic to the newly connected client
-    const uri = process.env.CONNECT_STRING;
-    const client = await MongoClient.connect(uri);
-    console.log("Connected to MongoDB");
 
-    // Initialize database and collections
-    const db = client.db("gotit");
-    const classesCollection = db.collection("classes");
-    const classDoc = await classesCollection.findOne({
-      _id: new ObjectId(classId),
+    await withMongoDB(uri, "gotit", async (database) => {
+      const classesCollection = database.collection("classes");
+      const classDoc = await classesCollection.findOne({
+        _id: new ObjectId(Number(classId)),
+      });
+      if (classDoc) {
+        socket.emit("currentTopic", { currentTopic: classDoc.cur_topic });
+      }
     });
-    if (classDoc) {
-      socket.emit("currentTopic", { currentTopic: classDoc.cur_topic });
-    }
-    await client.close();
   });
 
   // Handle student voting
