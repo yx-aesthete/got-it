@@ -46,7 +46,7 @@ export default function KeynoteList() {
       {listOfKeynotes.map((keynote, index) => {
         return (
           <KeynoteEntity
-            isOdd={index % 2 === 0}
+            isodd={index % 2 === 0}
             height={calculateHeight(
               keynote.timeEstimated,
               totalTime,

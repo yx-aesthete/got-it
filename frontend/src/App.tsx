@@ -10,6 +10,8 @@ import Classes from "./components/pages/classes/Classes";
 import ParticipantPage from "./components/pages/participant/ParticipantPage";
 import { DataProvider } from "./contexts/DataContext";
 import KeynoteList from "./components/pages/keynote/Keynote";
+import useData from "./hooks/UseData";
+import LoadingPage from "./components/pages/loadingPage/loadingPage";
 
 function App() {
   // TODO: Move to context but here for now
@@ -30,24 +32,28 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <ClassProvider>
-          <GlobalWrapper>
-            <Routes>
-              {/* Tutor Routes */}
-              <Route path="/tutor/classes" element={<Classes />} />
+        <DataProvider>
+          <ClassProvider>
+            <GlobalWrapper>
+              {/* <KeynoteList /> */}
+              <Routes>
+                {/* Tutor Routes */}
+                <Route path="/tutor/classes" element={<Classes />} />
 
-              {/* Participant Routes */}
-              <Route
-                path="/participant/class/:number"
-                element={<ParticipantPage />}
-              />
+                {/* Participant Routes */}
+                <Route
+                  path="/participant/class/:number"
+                  element={<ParticipantPage />}
+                />
 
-              {/* Shared Routes */}
-              <Route path="/vote" element={<VotingPage />} />
-              <Route path="/" element={<VotingPage />} />
-            </Routes>
-          </GlobalWrapper>
-        </ClassProvider>
+                {/* Shared Routes */}
+                <Route path="/vote" element={<VotingPage />} />
+                <Route path="/" element={<Classes />} />
+
+              </Routes>
+            </GlobalWrapper>
+          </ClassProvider>
+        </DataProvider>
       </Router>
     </ThemeProvider>
   );
