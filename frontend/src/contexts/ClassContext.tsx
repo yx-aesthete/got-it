@@ -6,7 +6,7 @@ interface ClassContextType {
   activeClass: string | null;
   handleEdit: () => void;
   handlePresent: () => void;
-  setActiveClass: (name: string) => void;
+  setActiveClassWrapper: (name: string | undefined) => void;
 }
 
 export const ClassContext = createContext<ClassContextType | undefined>(
@@ -17,8 +17,11 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  console.log("🚀 ~ isEditing:", isEditing);
   const [isPresenting, setIsPresenting] = useState(false);
+  console.log("🚀 ~ isPresenting:", isPresenting);
   const [activeClass, setActiveClass] = useState<string | null>(null);
+  console.log("🚀 ~ activeClass:", activeClass);
 
   // Function to handle editing the active class
   const handleEdit = () => {
@@ -35,11 +38,14 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   // Function to set the active class
-  const setActiveClassWrapper = (name: string) => {
-    setActiveClass(name);
-    // Reset editing and presenting states when a new class is activated
-    setIsEditing(false);
-    setIsPresenting(false);
+  const setActiveClassWrapper = (name: string | undefined) => {
+    if (!isEditing && !isPresenting) {
+      console.log("name", name);
+      setActiveClass(name ?? null);
+      // Reset editing and presenting states when a new class is activated
+      setIsEditing(false);
+      setIsPresenting(false);
+    }
   };
 
   return (
@@ -50,7 +56,7 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
         activeClass,
         handleEdit,
         handlePresent,
-        setActiveClass: setActiveClassWrapper,
+        setActiveClassWrapper,
       }}
     >
       {children}

@@ -54,18 +54,40 @@ async function addQuestionByIdToTopic(className, topicName, questionId) {
   });
 }
 
-async function voteOnQuestion(className, topicName, questionId, answerIndex) {
+// Function to vote on a specific question by its ObjectId
+async function voteOnQuestion(
+  className,
+  topicName,
+  questionId,
+  answerIndex,
+  userId
+) {
   if (answerIndex < 0 || answerIndex > 4) {
     console.log("Invalid answer index. It must be between 0 and 4.");
+    return;
+  }
+  // Validate userId
+  if (!ObjectId.isValid(userId)) {
+    console.log("Invalid userId. It must be a 24-character hex string.");
     return;
   }
 
   try {
     return await withMongoDB(uri, "gotit", async (database) => {
-      const topicsCollection = database.collection("classes");
-
       // Use dynamic field name in the update operation
       const updateField = `topics.$[topic].questions.$[question].answers.${answerIndex}`;
+      const topicsCollection = database.collection("classes"); // Replace with your collection name
+      const usersCollection = database.collection("students"); // Replace with your users collection name
+      const questionsCollection = database.collection("questions"); // Replace with your questions collection name
+
+      const questionDoc = await questionsCollection.findOne({
+        _id: new ObjectId(questionId),
+      });
+      if (!questionDoc) {
+        console.log("Question not found.");
+        return;
+      }
+      const questionText = questionDoc.question;
 
       // Update the specific answer in the answers array for the question with the given questionId
       const result = await topicsCollection.updateOne(
@@ -91,12 +113,37 @@ async function voteOnQuestion(className, topicName, questionId, answerIndex) {
         console.log("Class, topic, or question not found.");
       }
 
-      return result;
+      if (result.matchedCount > 0) {
+        console.log(`Vote added successfully to answer index ${answerIndex}.`);
+
+        const userUpdateResult = await usersCollection.updateOne(
+          { _id: new ObjectId(userId) },
+          {
+            $push: {
+              answers: {
+                class_name: className,
+                question: questionText,
+                topic_name: topicName,
+                vote: answerIndex,
+              },
+            },
+          }
+        );
+
+        if (userUpdateResult.matchedCount > 0) {
+          console.log("User's answers array updated successfully.");
+        } else {
+          console.log("User not found.");
+        }
+      } else {
+        console.log("Class, topic, or question not found.");
+      }
     });
   } catch (error) {
     console.error("Error voting on question:", error);
   }
 }
+// voteOnQuestion('Mathematics', 'Calculus', '66f839bdbfef096374e15ee0', 3, '66f886397dce0b4ff99562aa');
 
 async function getAllQuestions() {
   return await withMongoDB(uri, "gotit", async (database) => {
@@ -162,6 +209,8 @@ async function addTopicToClass(className, topicName) {
     const newTopic = {
       topic_name: topicName,
       questions: [],
+      topic_description: topicDescription,
+      estimated_time_minutes: 0,
     };
 
     const result = await classesCollection.updateOne(
@@ -175,6 +224,32 @@ async function addTopicToClass(className, topicName) {
 
     return result;
   });
+}
+
+async function createClass(className) {
+  try {
+    await client.connect();
+
+    const database = client.db("gotit"); // Replace with your database name
+    const classesCollection = database.collection("classes"); // Replace with your collection name
+
+    const newClass = {
+      class_name: className,
+      topics: [],
+      cur_topic: 0,
+      is_active: true,
+      description: "",
+    };
+
+    const result = await classesCollection.insertOne(newClass);
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  } finally {
+    await client.close();
+  }
 }
 
 export {

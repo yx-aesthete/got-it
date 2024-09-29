@@ -3,11 +3,15 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import theme from "./theme";
 import { ThemeProvider } from "styled-components";
 import { GlobalWrapper } from "./App.styles";
-import { listOfClasses } from "./components/organisms/classesList/ClassList.mock"; // Ensure this path is correct
+import { listOfClasses } from "./components/organisms/classesList/ClassList.mock";
 import { ClassProvider } from "./contexts/ClassContext";
 import VotingPage from "./components/pages/VotingPage";
 import Classes from "./components/pages/classes/Classes";
+import ParticipantPage from "./components/pages/participant/ParticipantPage";
 import { DataProvider } from "./contexts/DataContext";
+import KeynoteList from "./components/pages/keynote/Keynote";
+import useData from "./hooks/UseData";
+import LoadingPage from "./components/pages/loadingPage/loadingPage";
 
 function App() {
   // TODO: Move to context but here for now
@@ -31,10 +35,21 @@ function App() {
         <DataProvider>
           <ClassProvider>
             <GlobalWrapper>
+              {/* <KeynoteList /> */}
               <Routes>
+                {/* Tutor Routes */}
+                <Route path="/tutor/classes" element={<Classes />} />
+
+                {/* Participant Routes */}
+                <Route
+                  path="/participant/class/:number"
+                  element={<ParticipantPage />}
+                />
+
+                {/* Shared Routes */}
                 <Route path="/vote" element={<VotingPage />} />
-                <Route path="/classes" element={<Classes />} />
                 <Route path="/" element={<Classes />} />
+
               </Routes>
             </GlobalWrapper>
           </ClassProvider>

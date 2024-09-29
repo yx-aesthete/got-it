@@ -31,8 +31,8 @@ const DescWrapper = styled.div`
 `;
 
 interface ClassEntityProps {
-  name: string;
-  description: string;
+  name: string | undefined;
+  description: string | undefined;
   onClick?: () => void;
   isActive: boolean;
 }
@@ -43,6 +43,7 @@ const ClassEntity: React.FC<ClassEntityProps> = ({
   onClick,
   isActive,
 }) => {
+  console.log(isActive, name, description);
   return (
     <ClassEntityWrapper onClick={onClick} isActive={isActive}>
       <Typography
