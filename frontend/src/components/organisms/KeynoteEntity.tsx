@@ -10,20 +10,23 @@ const KeynoteEntityWrapper = styled.div<{
   isActive: boolean;
   height: number;
   isodd: boolean;
+  hasBeenCompleted: boolean;
 }>`
   transition: all 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
   height: ${(props) => props.height}px;
   background-color: ${(props) =>
-    props.isActive
-      ? props.theme.colors.pinkLight
-      : props.theme.colors.pinkDark};
-  opacity: ${(props) => (props.isodd ? 0.8 : 1)};
+    props.hasBeenCompleted
+      ? "rgb(52, 118, 249)" // Background if completed
+      : props.isActive
+      ? "rgb(76, 132, 245)" // Background if active
+      : props.isodd
+      ? props.theme.colors.pinkLight // Background if odd
+      : props.theme.colors.pinkDark}; // Background if even
   padding: 12px;
   position: relative;
   overflow: hidden;
-  height: ;
 `;
 
 const ContentWrapper = styled.div`
@@ -36,6 +39,7 @@ const ContentWrapper = styled.div`
 interface KeynoteEntityProps {
   title: string;
   isActive: boolean;
+  hasBeenCompleted: boolean;
   height: number;
   isodd: boolean;
   index: number;
@@ -43,13 +47,20 @@ interface KeynoteEntityProps {
 
 const KeynoteEntity: React.FC<KeynoteEntityProps> = ({
   title,
+  hasBeenCompleted,
   isActive,
   height,
   isodd,
   index,
 }) => {
+  console.log("🚀 ~ hasBeenCompleted:", hasBeenCompleted);
   return (
-    <KeynoteEntityWrapper isodd={isodd} isActive={isActive} height={height}>
+    <KeynoteEntityWrapper
+      isodd={isodd}
+      isActive={isActive}
+      height={height}
+      hasBeenCompleted={hasBeenCompleted}
+    >
       <ContentWrapper>
         <Typography
           animated

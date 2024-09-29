@@ -18,7 +18,7 @@ const theme: Theme = {
 
     // got-it palette
     pinkDark: "#dc4a6c",
-    pinkLight: "#dc4a6c",
+    pinkLight: "#CC4564FF",
     salmonDark: "#ff9294",
     salmonLight: "#F6B4B0FF",
     purpleLight: "#D5B5E7FF",
@@ -27,6 +27,7 @@ const theme: Theme = {
     purpleBlack: "#151319",
 
     blueLight: "#6094FA",
+    blueDark: "#3476F9FFA",
     redLight: "##FF675E",
 
     // Grey primary
@@ -76,8 +77,9 @@ type ThemeColors = {
   salmonDark: string;
   salmonLight: string;
   purpleLight: string;
-  blueLight:string;
-  redLight:string;
+  blueLight: string;
+  blueDark: string;
+  redLight: string;
   purpleMid: string;
   purpleDark: string;
   purpleBlack: string;

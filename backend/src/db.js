@@ -9,8 +9,11 @@ if (!uri) {
     "MongoDB connection string is not defined in environment variables"
   );
 }
-async function withMongoDB(uri = uri, dbName, callback, leaveOpen = false) {
-  const client = new MongoClient(uri);
+async function withMongoDB(uri, dbName, callback, leaveOpen = false) {
+  const client = new MongoClient(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   try {
     await client.connect();
     const database = client.db(dbName);
