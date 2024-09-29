@@ -32,7 +32,7 @@ function App() {
             <Routes>
               <Route path="/vote" element={<VotingPage />} />
               <Route path="/classes" element={<Classes />} />
-              <Route path="/" element={<VotingPage />} />
+              <Route path="/" element={<Classes />} />
             </Routes>
           </GlobalWrapper>
         </ClassProvider>
