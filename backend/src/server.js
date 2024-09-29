@@ -200,3 +200,95 @@ app.get("/getAllClasses", async (req, res) => {
       .json({ success: false, message: "Failed to fetch classes" });
   }
 });
+
+io.on("connection", (socket) => {
+  console.log("A client connected");
+
+  // When a student joins a class, join them to a room
+  socket.on("joinClass", async (data) => {
+    const { classId } = data;
+    socket.join(`class_${classId}`);
+    console.log(`Client joined class with ID: ${classId}`);
+
+    // Send the current topic to the newly connected client
+
+    await withMongoDB(uri, "gotit", async (database) => {
+      const classesCollection = database.collection("classes");
+      const classDoc = await classesCollection.findOne({
+        _id: new ObjectId(Number(classId)),
+      });
+      if (classDoc) {
+        socket.emit("currentTopic", { currentTopic: classDoc.cur_topic });
+      }
+    });
+  });
+
+  // Handle student voting
+  socket.on("voteOnQuestion", async (data) => {
+    const { className, topicName, questionId, answerIndex } = data;
+
+    try {
+      // Call your existing voteOnQuestion function to handle the vote
+      await voteOnQuestion(className, topicName, questionId, answerIndex);
+      console.log(
+        `Vote recorded: class=${className}, topic=${topicName}, question=${questionId}, answer=${answerIndex}`
+      );
+
+      // Optionally, you can emit an acknowledgment to the student
+      socket.emit("voteAcknowledged", { success: true });
+
+      // You might also want to broadcast the updated vote count or results to all students in the class
+      // io.to(`class_${classId}`).emit("voteUpdate", { ...updatedVoteData });
+    } catch (error) {
+      console.error("Error recording vote:", error);
+      socket.emit("voteAcknowledged", { success: false, error: error.message });
+    }
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("A client disconnected");
+  });
+});
+
+app.post("/start-voting", express.json(), async (req, res) => {
+  const { classId, topicName } = req.body;
+
+  if (!classId || !topicName) {
+    return res
+      .status(400)
+      .json({ error: "classId and topicName are required." });
+  }
+
+  try {
+    // Broadcast the startVoting signal to all clients in the class
+    io.to(`class_${classId}`).emit("startVoting", { topicName });
+    console.log(
+      `Lecturer started voting for class ${classId} on topic ${topicName}`
+    );
+    res.json({
+      success: true,
+      message: `Voting started for class ${classId} on topic ${topicName}`,
+    });
+  } catch (error) {
+    console.error("Error starting voting:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to start voting." });
+  }
+});
+
+app.get("/current-votes/:className", async (req, res) => {
+  const { className } = req.params;
+
+  try {
+    await withMongoDB(uri, "gotit", async (database) => {
+      const votesCollection = database.collection("votes");
+      const votes = await votesCollection.find({ className }).toArray();
+      res.json(votes);
+    });
+  } catch (error) {
+    res.status(500).send("Error fetching votes");
+  }
+});
+
