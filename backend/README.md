@@ -1,4 +1,6 @@
-# got-it
+# got-it - backend
+
+We excitely annouce that you can setup our backend using documentation below to run locally **or use our hosted API at 🔥[got-it.onrender.com](https://got-it.onrender.com/) 🔥 IT's WORKING AND ALIVE**
 
 ## setup
 
@@ -16,18 +18,24 @@ This documentation outlines the API endpoints and real-time communication events
 
 ## Table of Contents
 
+- [Setup](#setup)
 - [API Endpoints](#api-endpoints)
   - [POST /incrementCurrentTopic](#post-incrementcurrenttopic)
   - [POST /addQuestionByIdToTopic](#post-addquestionbyidtotopic)
   - [GET /getAllQuestions](#get-getallquestions)
   - [GET /getAllClasses](#get-getallclasses)
+  - [POST /start-voting](#post-start-voting)
+  - [GET /current-votes/:className](#get-current-votesclassname)
 - [Socket.IO Events](#socketio-events)
   - [Server-Side Events](#server-side-events)
+    - [connection](#connection)
     - [joinClass](#joinclass)
     - [voteOnQuestion](#voteonquestion)
     - [disconnect](#disconnect)
   - [Client-Side Events](#client-side-events)
     - [currentTopic](#currenttopic)
+    - [topicUpdated](#topicupdated)
+    - [startVoting](#startvoting)
     - [voteAcknowledged](#voteacknowledged)
 - [Data Models](#data-models)
   - [Class Schema](#class-schema)
@@ -37,6 +45,14 @@ This documentation outlines the API endpoints and real-time communication events
   - [Socket.IO Client Usage](#socketio-client-usage)
 - [Notes](#notes)
 - [Conclusion](#conclusion)
+
+---
+
+## Setup
+
+1. Create a `.env` file using the provided `env` file.
+2. Run `npm install` to install dependencies.
+3. Run `npm start` to start the server, or use a debugging extension (see `launch.json`).
 
 ---
 
@@ -83,7 +99,7 @@ Increments the current topic index for a specified class.
 
 - **Description**:
 
-  Increments the `cur_topic` field in the database for the specified class. Emits a WebSocket event `topicUpdated` to all connected clients in that class room to notify them of the topic change.
+  Increments the `cur_topic` field in the database for the specified class. Emits a WebSocket event `topicUpdated` to all connected clients in that class to notify them of the topic change.
 
 - **Example Request**:
 
@@ -200,11 +216,8 @@ Retrieves all questions from the database.
     [
       {
         "_id": "60f839bdbfef096374e15ee0",
-        "question": "What is the derivative of x^2?"
-      },
-      {
-        "_id": "60f839bdbfef096374e15ee1",
-        "question": "Explain Newton's second law."
+        "question": "What is the derivative of x^2?",
+        "options": ["2x", "x^2", "x", "None of the above"]
       }
       // ...additional questions
     ]
@@ -237,11 +250,8 @@ Retrieves all questions from the database.
   [
     {
       "_id": "60f839bdbfef096374e15ee0",
-      "question": "What is the derivative of x^2?"
-    },
-    {
-      "_id": "60f839bdbfef096374e15ee1",
-      "question": "Explain Newton's second law."
+      "question": "What is the derivative of x^2?",
+      "options": ["2x", "x^2", "x", "None of the above"]
     }
     // ...additional questions
   ]
@@ -275,7 +285,7 @@ Retrieves all classes from the database.
             "questions": [
               {
                 "questionId": "60f839bdbfef096374e15ee0",
-                "answers": [0, 1, 0, 0, 0]
+                "answers": [0, 1, 0, 0]
               }
             ]
           }
@@ -321,7 +331,7 @@ Retrieves all classes from the database.
           "questions": [
             {
               "questionId": "60f839bdbfef096374e15ee0",
-              "answers": [0, 1, 0, 0, 0]
+              "answers": [0, 1, 0, 0]
             }
           ]
         }
@@ -333,11 +343,169 @@ Retrieves all classes from the database.
 
 ---
 
+### POST /start-voting
+
+Initiates a voting session on a specific topic for a class.
+
+- **URL**: `/start-voting`
+- **Method**: `POST`
+- **Headers**: `Content-Type: application/json`
+- **Request Body**:
+
+  ```json
+  {
+    "classId": "String", // Required
+    "topicName": "String" // Required
+  }
+  ```
+
+- **Success Response**:
+
+  - **Status Code**: `200 OK`
+  - **Body**:
+
+    ```json
+    {
+      "success": true,
+      "message": "Voting started for class [classId] on topic [topicName]"
+    }
+    ```
+
+- **Error Responses**:
+
+  - **Status Code**: `400 Bad Request`
+
+    ```json
+    {
+      "error": "classId and topicName are required."
+    }
+    ```
+
+  - **Status Code**: `500 Internal Server Error`
+
+    ```json
+    {
+      "success": false,
+      "message": "Failed to start voting."
+    }
+    ```
+
+- **Description**:
+
+  Starts a voting session for the specified topic in a class by emitting a `startVoting` event to all clients in that class.
+
+- **Example Request**:
+
+  ```json
+  POST /start-voting
+  Content-Type: application/json
+
+  {
+    "classId": "60f83ab9bfef096374e15eea",
+    "topicName": "Calculus"
+  }
+  ```
+
+- **Example Response**:
+
+  ```json
+  {
+    "success": true,
+    "message": "Voting started for class 60f83ab9bfef096374e15eea on topic Calculus"
+  }
+  ```
+
+---
+
+### GET /current-votes/:className
+
+Retrieves the current votes for a specific class.
+
+- **URL**: `/current-votes/:className`
+- **Method**: `GET`
+- **Headers**: None
+- **Path Parameters**:
+
+  - `className`: The name of the class to retrieve votes for.
+
+- **Success Response**:
+
+  - **Status Code**: `200 OK`
+  - **Body**:
+
+    ```json
+    [
+      {
+        "_id": "voteDocumentId",
+        "className": "Mathematics",
+        "topicName": "Calculus",
+        "questionId": "60f839bdbfef096374e15ee0",
+        "votes": [10, 5, 3, 2]
+      }
+      // ...additional vote records
+    ]
+    ```
+
+- **Error Response**:
+
+  - **Status Code**: `500 Internal Server Error`
+
+    ```json
+    {
+      "error": "Error fetching votes"
+    }
+    ```
+
+- **Description**:
+
+  Fetches the current vote counts for all questions in the specified class.
+
+- **Example Request**:
+
+  ```http
+  GET /current-votes/Mathematics
+  ```
+
+- **Example Response**:
+
+  ```json
+  [
+    {
+      "_id": "voteDocumentId",
+      "className": "Mathematics",
+      "topicName": "Calculus",
+      "questionId": "60f839bdbfef096374e15ee0",
+      "votes": [10, 5, 3, 2]
+    }
+    // ...additional vote records
+  ]
+  ```
+
+---
+
 ## Socket.IO Events
 
 ### Server-Side Events
 
 These events are emitted by the client and listened to by the server.
+
+#### connection
+
+Triggered when a client connects to the server.
+
+- **Event Name**: `connection`
+- **Description**:
+
+  The server logs when a client connects. The socket instance is used to handle further communication.
+
+- **Example Server Listener**:
+
+  ```javascript
+  io.on("connection", (socket) => {
+    console.log("A client connected");
+    // Additional event handlers
+  });
+  ```
 
 #### joinClass
 
@@ -371,16 +539,16 @@ Allows a client to vote on a question.
 
   ```json
   {
-    "className": "String",      // Required
-    "topicName": "String",      // Required
-    "questionId": "String",     // Required
-    "answerIndex": Number       // Required, 0-4
+    "className": "String",     // Required
+    "topicName": "String",     // Required
+    "questionId": "String",    // Required
+    "answerIndex": Number      // Required, 0-based index
   }
   ```
 
 - **Description**:
 
-  When a client emits `voteOnQuestion`, the server records the vote and optionally acknowledges it via the `voteAcknowledged` event.
+  When a client emits `voteOnQuestion`, the server records the vote using the `voteOnQuestion` function and optionally acknowledges it via the `voteAcknowledged` event.
 
 - **Example Client Emission**:
 
@@ -435,6 +603,52 @@ Sends the current topic index to the client upon joining a class.
 
   ```javascript
   socket.emit("currentTopic", { currentTopic: 2 });
+  ```
+
+#### topicUpdated
+
+Notifies clients that the current topic has been updated.
+
+- **Event Name**: `topicUpdated`
+- **Data Payload**:
+
+  ```json
+  {
+    "newTopicIndex": Number
+  }
+  ```
+
+- **Description**:
+
+  Emitted by the server when the current topic is incremented, notifying all clients in the class.
+
+- **Example Server Emission**:
+
+  ```javascript
+  io.to(`class_${classId}`).emit("topicUpdated", { newTopicIndex });
+  ```
+
+#### startVoting
+
+Signals the start of a voting session on a topic.
+
+- **Event Name**: `startVoting`
+- **Data Payload**:
+
+  ```json
+  {
+    "topicName": "String"
+  }
+  ```
+
+- **Description**:
+
+  Emitted by the server to notify clients in a class that a voting session has started for a specific topic.
+
+- **Example Server Emission**:
+
+  ```javascript
+  io.to(`class_${classId}`).emit("startVoting", { topicName });
   ```
 
 #### voteAcknowledged
@@ -570,6 +784,39 @@ fetch("http://localhost:8080/getAllClasses")
   .catch((error) => console.error("Fetch error:", error));
 ```
 
+#### Start Voting
+
+```javascript
+fetch("http://localhost:8080/start-voting", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    classId: "60f83ab9bfef096374e15eea",
+    topicName: "Calculus",
+  }),
+})
+  .then((response) => response.json())
+  .then((data) => {
+    if (data.success) {
+      console.log(data.message);
+    } else {
+      console.error(`Error: ${data.message}`);
+    }
+  })
+  .catch((error) => console.error("Fetch error:", error));
+```
+
+#### Get Current Votes
+
+```javascript
+fetch("http://localhost:8080/current-votes/Mathematics")
+  .then((response) => response.json())
+  .then((votes) => {
+    console.log("Current Votes:", votes);
+  })
+  .catch((error) => console.error("Fetch error:", error));
+```
+
 ### Socket.IO Client Usage
 
 ```javascript
@@ -585,6 +832,16 @@ socket.emit("joinClass", { classId });
 // Listen for the current topic
 socket.on("currentTopic", (data) => {
   console.log(`Current topic is: ${data.currentTopic}`);
+});
+
+// Listen for topic updates
+socket.on("topicUpdated", (data) => {
+  console.log(`Topic updated to index: ${data.newTopicIndex}`);
+});
+
+// Listen for start of voting
+socket.on("startVoting", (data) => {
+  console.log(`Voting started on topic: ${data.topicName}`);
 });
 
 // Vote on a question
@@ -620,7 +877,7 @@ voteOnQuestion("Mathematics", "Calculus", "60f839bdbfef096374e15ee0", 2);
 
 - **CORS Configuration**:
 
-  - The server is configured to allow all origins (`origin: "*"`) in the Socket.IO server. Adjust as necessary for your security requirements.
+  - The server is configured to allow all origins (`origin: "*"`) in both the Express app and the Socket.IO server. Adjust as necessary for your security requirements.
 
 - **Error Handling**:
 
@@ -628,11 +885,15 @@ voteOnQuestion("Mathematics", "Calculus", "60f839bdbfef096374e15ee0", 2);
 
 - **MongoDB Connection**:
 
-  - The server connects to MongoDB within Socket.IO events. Ensure that this connection is managed appropriately in a production environment (e.g., using a singleton connection).
+  - The server uses a helper function `withMongoDB` for MongoDB operations. Ensure that database connections are managed appropriately in a production environment.
 
 - **Socket.IO Version Compatibility**:
 
   - Ensure that the versions of `socket.io` on the server and `socket.io-client` on the client are compatible.
+
+- **Data Validation**:
+
+  - The server performs basic validation on required fields. Additional validation may be necessary depending on your application's needs.
 
 ---
 
@@ -643,6 +904,8 @@ This documentation provides an overview of the API endpoints and Socket.IO event
 - Incrementing the current topic of a class.
 - Adding questions to specific topics within a class.
 - Fetching all questions and classes.
+- Starting a voting session on a topic.
+- Retrieving current votes for a class.
 - Real-time communication between the server and clients through Socket.IO.
 
 By following this documentation, you can integrate these endpoints and events into your application to facilitate interactive educational experiences between lecturers and students.
@@ -650,3 +913,5 @@ By following this documentation, you can integrate these endpoints and events in
 ---
 
 If you have any further questions or need assistance, feel free to reach out.
+
+---

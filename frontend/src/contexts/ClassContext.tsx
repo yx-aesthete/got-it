@@ -3,9 +3,10 @@ import React, { createContext, useContext, useState } from "react";
 interface ClassContextType {
   isEditing: boolean;
   isPresenting: boolean;
+  presentingName: string;
   activeClass: string | null;
   handleEdit: () => void;
-  handlePresent: () => void;
+  handlePresent: () => void; // Accept a name parameter
   setActiveClassWrapper: (name: string | undefined) => void;
 }
 
@@ -17,11 +18,9 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  console.log("🚀 ~ isEditing:", isEditing);
   const [isPresenting, setIsPresenting] = useState(false);
-  console.log("🚀 ~ isPresenting:", isPresenting);
   const [activeClass, setActiveClass] = useState<string | null>(null);
-  console.log("🚀 ~ activeClass:", activeClass);
+  const [presentingName, setPresentingName] = useState<string>("");
 
   // Function to handle editing the active class
   const handleEdit = () => {
@@ -32,19 +31,26 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Function to toggle presenting the active class
   const handlePresent = () => {
+    // Accepts a name parameter
     if (activeClass && !isEditing) {
       setIsPresenting((prev) => !prev);
+      if (!isPresenting) {
+        setPresentingName(activeClass); // Set the presenting name when starting
+      } else {
+        setPresentingName(""); // Clear presenting name when stopping
+        setActiveClass(null); // Optionally clear active class when not presenting
+      }
     }
   };
 
   // Function to set the active class
   const setActiveClassWrapper = (name: string | undefined) => {
     if (!isEditing && !isPresenting) {
-      console.log("name", name);
       setActiveClass(name ?? null);
       // Reset editing and presenting states when a new class is activated
       setIsEditing(false);
       setIsPresenting(false);
+      setPresentingName(""); // Clear presenting name if not presenting
     }
   };
 
@@ -54,6 +60,7 @@ export const ClassProvider: React.FC<{ children: React.ReactNode }> = ({
         isEditing,
         isPresenting,
         activeClass,
+        presentingName,
         handleEdit,
         handlePresent,
         setActiveClassWrapper,
