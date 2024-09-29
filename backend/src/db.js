@@ -226,32 +226,6 @@ async function addTopicToClass(className, topicName) {
   });
 }
 
-async function createClass(className) {
-  try {
-    await client.connect();
-
-    const database = client.db("gotit"); // Replace with your database name
-    const classesCollection = database.collection("classes"); // Replace with your collection name
-
-    const newClass = {
-      class_name: className,
-      topics: [],
-      cur_topic: 0,
-      is_active: true,
-      description: "",
-    };
-
-    const result = await classesCollection.insertOne(newClass);
-
-    return result;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  } finally {
-    await client.close();
-  }
-}
-
 export {
   addQuestionByIdToTopic,
   voteOnQuestion,
