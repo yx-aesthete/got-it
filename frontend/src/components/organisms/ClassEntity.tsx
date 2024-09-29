@@ -31,8 +31,8 @@ const DescWrapper = styled.div`
 `;
 
 interface ClassEntityProps {
-  name: string;
-  description: string;
+  name: string | undefined;
+  description: string | undefined;
   onClick?: () => void;
   isActive: boolean;
 }

@@ -19,24 +19,24 @@ const ClassListWrapper = styled.div`
 
 // Define the type for the classes prop
 interface ClassListProps {
-  classes: Array<{ id: string; name: string; description?: string }>;
+  classes: Array<{
+    class_name: string | undefined;
+    id: string;
+    name: string;
+    description?: string;
+  }>;
 }
 
 export default function ClassList({ classes }: ClassListProps) {
   const { activeClass, setActiveClass } = useClassContext();
-
-  
 
   return (
     <ClassListWrapper>
       {classes.map((classItem) => (
         <ClassEntity
           key={classItem.id}
-          name={classItem.name}
-          // description={classItem.description}
-          description={
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation."
-          }
+          name={classItem.class_name}
+          description={classItem.description}
           isActive={activeClass === classItem.name}
           onClick={() => setActiveClass(classItem.name)}
         />
