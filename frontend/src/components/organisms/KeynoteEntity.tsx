@@ -10,6 +10,7 @@ const KeynoteEntityWrapper = styled.div<{
   isActive: boolean;
   height: number;
   isodd: boolean;
+  hasBeenCompleted: boolean;
 }>`
   transition: all 0.3s ease-in-out;
   display: flex;
@@ -17,13 +18,13 @@ const KeynoteEntityWrapper = styled.div<{
   height: ${(props) => props.height}px;
   background-color: ${(props) =>
     props.isActive
+      ? props.theme.colors.lightBlue
+      : props.isodd
       ? props.theme.colors.pinkLight
       : props.theme.colors.pinkDark};
-  opacity: ${(props) => (props.isodd ? 0.8 : 1)};
   padding: 12px;
   position: relative;
   overflow: hidden;
-  height: ;
 `;
 
 const ContentWrapper = styled.div`
@@ -36,6 +37,7 @@ const ContentWrapper = styled.div`
 interface KeynoteEntityProps {
   title: string;
   isActive: boolean;
+  hasBeenCompleted: boolean;
   height: number;
   isodd: boolean;
   index: number;
@@ -43,11 +45,13 @@ interface KeynoteEntityProps {
 
 const KeynoteEntity: React.FC<KeynoteEntityProps> = ({
   title,
+  hasBeenCompleted,
   isActive,
   height,
   isodd,
   index,
 }) => {
+  console.log("🚀 ~ height:", height)
   return (
     <KeynoteEntityWrapper isodd={isodd} isActive={isActive} height={height}>
       <ContentWrapper>

@@ -3,37 +3,37 @@ import { io } from "socket.io-client";
 
 // Initialize WebSocket connection
 // const socket = io("http://got-it.onrender.com");
-const socket = io("http://localhost:8080");
+// const socket = io("http://localhost:8080");
 
-// API endpoint base URL
+// // API endpoint base URL
 const API_BASE_URL = "http://localhost:8080";
 
-// Socket Events
-export const joinClass = (classId: any) => {
-  socket.emit("joinClass", { classId });
-};
+// // Socket Events
+// export const joinClass = (classId: any) => {
+//   socket.emit("joinClass", { classId });
+// };
 
-export const listenToCurrentTopic = (callback: any) => {
-  socket.on("currentTopic", callback);
-};
+// export const listenToCurrentTopic = (callback: any) => {
+//   socket.on("currentTopic", callback);
+// };
 
-export const listenToTopicChanges = (callback: any) => {
-  socket.on("curTopicChanged", callback);
-};
+// export const listenToTopicChanges = (callback: any) => {
+//   socket.on("curTopicChanged", callback);
+// };
 
-export const voteOnQuestionSocket = (
-  className: any,
-  topicName: any,
-  questionId: any,
-  answerIndex: any
-) => {
-  socket.emit("voteOnQuestion", {
-    className,
-    topicName,
-    questionId,
-    answerIndex,
-  });
-};
+// export const voteOnQuestionSocket = (
+//   className: any,
+//   topicName: any,
+//   questionId: any,
+//   answerIndex: any
+// ) => {
+//   socket.emit("voteOnQuestion", {
+//     className,
+//     topicName,
+//     questionId,
+//     answerIndex,
+//   });
+// };
 
 // REST API Calls using Axios
 export const getAllQuestions = async () => {
