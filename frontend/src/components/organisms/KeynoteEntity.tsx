@@ -17,13 +17,13 @@ const KeynoteEntityWrapper = styled.div<{
   height: ${(props) => props.height}px;
   background-color: ${(props) =>
     props.isActive
+      ? props.theme.colors.lightBlue
+      : props.isodd
       ? props.theme.colors.pinkLight
       : props.theme.colors.pinkDark};
-  opacity: ${(props) => (props.isodd ? 0.8 : 1)};
   padding: 12px;
   position: relative;
   overflow: hidden;
-  height: ;
 `;
 
 const ContentWrapper = styled.div`

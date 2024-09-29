@@ -18,7 +18,7 @@ const theme: Theme = {
 
     // got-it palette
     pinkDark: "#dc4a6c",
-    pinkLight: "#dc4a6c",
+    pinkLight: "#CC4564FF",
     salmonDark: "#ff9294",
     salmonLight: "#F6B4B0FF",
     purpleLight: "#D5B5E7FF",
