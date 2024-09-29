@@ -1,8 +1,12 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import { getAllQuestions, getAllClasses, joinClass, listenToCurrentTopic, listenToTopicChanges } from "../services/services";
+import {
+  getAllQuestions,
+  getAllClasses,
+  joinClass,
+  listenToCurrentTopic,
+  listenToTopicChanges,
+} from "../services/services";
 
-
-// Define the shape of your context
 interface DataContextType {
   questions: any[];
   classes: any[];
@@ -14,7 +18,6 @@ interface DataContextType {
   handleJoinClass: (classId: string) => void;
 }
 
-// Create a default value for the context
 const defaultValue: DataContextType = {
   questions: [],
   classes: [],
@@ -26,17 +29,19 @@ const defaultValue: DataContextType = {
   handleJoinClass: () => {},
 };
 
-// Create the context with the default value
 const DataContext = createContext<DataContextType>(defaultValue);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [questions, setQuestions] = useState<any[]>([]);
+  console.log("🚀 ~ DataProvider ~ questions:", questions);
   const [classes, setClasses] = useState<any[]>([]);
+  console.log("🚀 ~ DataProvider ~ classes:", classes);
   const [currentTopic, setCurrentTopic] = useState<string | null>(null);
+  console.log("🚀 ~ DataProvider ~ currentTopic:", currentTopic);
   const [isLoading, setIsLoading] = useState(false);
+  console.log("🚀 ~ DataProvider ~ isLoading:", isLoading);
   const [isError, setIsError] = useState(false);
 
-  // Fetch all questions
   const fetchQuestions = async () => {
     setIsLoading(true);
     setIsError(false);
@@ -50,7 +55,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Fetch all classes
   const fetchClasses = async () => {
     setIsLoading(true);
     setIsError(false);
@@ -64,20 +68,27 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Handle joining a class
   const handleJoinClass = (classId: string) => {
     joinClass(classId);
   };
 
-  // Listen for current topic updates
   useEffect(() => {
-    listenToCurrentTopic((data: { currentTopic: React.SetStateAction<string | null>; }) => {
-      setCurrentTopic(data.currentTopic);
-    });
+    console.log("🚀 ~ useEffect ~ DataProvider");
+    listenToCurrentTopic(
+      (data: { currentTopic: React.SetStateAction<string | null> }) => {
+        setCurrentTopic(data.currentTopic);
+      }
+    );
 
-    listenToTopicChanges((data: { newCurTopic: React.SetStateAction<string | null>; }) => {
-      setCurrentTopic(data.newCurTopic);
-    });
+    listenToTopicChanges(
+      (data: { newCurTopic: React.SetStateAction<string | null> }) => {
+        setCurrentTopic(data.newCurTopic);
+      }
+    );
+
+    // Fetch questions and classes when the component mounts
+    fetchQuestions();
+    fetchClasses();
   }, []);
 
   return (

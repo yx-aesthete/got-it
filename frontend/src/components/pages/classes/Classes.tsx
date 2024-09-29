@@ -6,6 +6,7 @@ import useData from '../../../hooks/UseData';
 export default function Classes() {
 
   const { classes } = useData();
+  
   return (
     <>
       <ClassContainer />

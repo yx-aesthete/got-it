@@ -7,6 +7,7 @@ import { listOfClasses } from "./components/organisms/classesList/ClassList.mock
 import { ClassProvider } from "./contexts/ClassContext";
 import VotingPage from "./components/pages/VotingPage";
 import Classes from "./components/pages/classes/Classes";
+import { DataProvider } from "./contexts/DataContext";
 
 function App() {
   // TODO: Move to context but here for now
@@ -27,15 +28,17 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <ClassProvider>
-          <GlobalWrapper>
-            <Routes>
-              <Route path="/vote" element={<VotingPage />} />
-              <Route path="/classes" element={<Classes />} />
-              <Route path="/" element={<Classes />} />
-            </Routes>
-          </GlobalWrapper>
-        </ClassProvider>
+        <DataProvider>
+          <ClassProvider>
+            <GlobalWrapper>
+              <Routes>
+                <Route path="/vote" element={<VotingPage />} />
+                <Route path="/classes" element={<Classes />} />
+                <Route path="/" element={<Classes />} />
+              </Routes>
+            </GlobalWrapper>
+          </ClassProvider>
+        </DataProvider>
       </Router>
     </ThemeProvider>
   );

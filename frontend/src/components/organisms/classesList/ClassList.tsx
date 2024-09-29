@@ -24,7 +24,8 @@ interface ClassListProps {
 
 export default function ClassList({ classes }: ClassListProps) {
   const { activeClass, setActiveClass } = useClassContext();
-  console.log("🚀 ~ ClassList ~ activeClass:", activeClass)
+
+  
 
   return (
     <ClassListWrapper>
