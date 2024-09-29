@@ -6,6 +6,7 @@ import { GlobalWrapper } from "./App.styles";
 import ClassContainer from "./components/organisms/ClassContainer";
 import { listOfClasses } from "./components/pages/classesList/ClassList.mock";
 import { ClassProvider } from "./contexts/ClassContext";
+import KeynoteList from "./components/pages/keynote/Keynote";
 
 function App() {
   //TODO  move to context but here for now
@@ -31,6 +32,7 @@ function App() {
         <GlobalWrapper>
           <ClassList />
           <ClassContainer />
+          <KeynoteList />
         </GlobalWrapper>
       </ClassProvider>
     </ThemeProvider>
