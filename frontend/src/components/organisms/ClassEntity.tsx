@@ -43,6 +43,7 @@ const ClassEntity: React.FC<ClassEntityProps> = ({
   onClick,
   isActive,
 }) => {
+  console.log(isActive, name, description);
   return (
     <ClassEntityWrapper onClick={onClick} isActive={isActive}>
       <Typography
