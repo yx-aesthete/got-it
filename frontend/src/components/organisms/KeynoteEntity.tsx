@@ -6,22 +6,24 @@ import {
   TypographyVariant,
 } from "../atoms/typography/Typography.autogen";
 
-const KeynoteEntityWrapper = styled.div<{ isActive: boolean; heightPercentage: number }>`
+const KeynoteEntityWrapper = styled.div<{
+  isActive: boolean;
+  height: number;
+  isOdd: boolean;
+}>`
   transition: all 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
+  height: ${(props) => props.height}px;
   background-color: ${(props) =>
     props.isActive
-      ? props.theme.colors.purpleLight
-      : props.theme.colors.purpleBlack};
+      ? props.theme.colors.pinkLight
+      : props.theme.colors.pinkDark};
+  opacity: ${(props) => (props.isOdd ? 0.8 : 1)};
   padding: 12px;
   position: relative;
   overflow: hidden;
-  height: ${({ heightPercentage }) => `${heightPercentage}%`}; 
-
-  &:hover {
-    height: ${({ heightPercentage }) => `${heightPercentage + 100}%`}; 
-  }
+  height: ;
 `;
 
 const ContentWrapper = styled.div`
@@ -34,26 +36,26 @@ const ContentWrapper = styled.div`
 interface KeynoteEntityProps {
   title: string;
   isActive: boolean;
-  heightPercentage: number;
+  height: number;
+  isOdd: boolean;
   index: number;
 }
 
 const KeynoteEntity: React.FC<KeynoteEntityProps> = ({
   title,
   isActive,
-  heightPercentage,
+  height,
+  isOdd,
   index,
 }) => {
+  console.log(height);
   return (
-    <KeynoteEntityWrapper
-      isActive={isActive}
-      heightPercentage={heightPercentage}
-    >
+    <KeynoteEntityWrapper isOdd={isOdd} isActive={isActive} height={height}>
       <ContentWrapper>
         <Typography
           animated
           animationType="fade"
-          variant={TypographyVariant.sectionHeader}
+          variant={TypographyVariant.sectionDescription}
           highlight_level={
             isActive ? HighlightLevel.menuActive : HighlightLevel.neutral
           }

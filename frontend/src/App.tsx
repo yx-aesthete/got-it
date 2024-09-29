@@ -31,8 +31,7 @@ function App() {
       <ClassProvider>
         <GlobalWrapper>
           <ClassList />
-          <ClassContainer />
-          <KeynoteList />
+          {/* <KeynoteList /> */}
         </GlobalWrapper>
       </ClassProvider>
     </ThemeProvider>
