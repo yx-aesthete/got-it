@@ -6,6 +6,7 @@ import { GlobalWrapper } from "./App.styles";
 import { listOfClasses } from "./components/organisms/classesList/ClassList.mock";
 import { ClassProvider } from "./contexts/ClassContext";
 import VotingPage from "./components/pages/VotingPage";
+import LandingPage from "./components/pages/LandPage";
 import Classes from "./components/pages/classes/Classes";
 import ParticipantPage from "./components/pages/participant/ParticipantPage";
 import { DataProvider } from "./contexts/DataContext";
@@ -47,7 +48,7 @@ function App() {
                 />
 
                 {/* Shared Routes */}
-                <Route path="/vote" element={<VotingPage />} />
+                <Route path="/voteLandingPage" element={<LandingPage />} />
                 <Route path="/" element={<Classes />} />
 
               </Routes>
