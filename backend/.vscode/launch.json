@@ -7,11 +7,20 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Run Backend",
+            "name": "Test backend",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/backend/server.js"
+            "program": "${workspaceFolder}/src/server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Test client",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/client_test.js"
         }
     ]
 }

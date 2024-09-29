@@ -2,6 +2,7 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { MongoClient, ObjectId } from "mongodb";
+import cors from "cors";
 import {
   incrementCurrentTopicInDatabase,
   addQuestionByIdToTopic,
@@ -13,6 +14,13 @@ import {
 
 const app = express();
 const server = http.createServer(app);
+
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST"],
+  })
+);
 
 app.use(express.json());
 const io = new Server(server, {
@@ -27,7 +35,6 @@ server.listen(8080, () => {
 });
 
 startListeningForClassChanges(io);
-console.log("LOL");
 
 app.post("/incrementCurrentTopic", (req, res) => {
   const classId = req.body.classId;

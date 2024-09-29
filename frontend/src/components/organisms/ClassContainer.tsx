@@ -2,11 +2,11 @@ import React from "react";
 import { styled } from "styled-components";
 import ControlIcons from "../molecules/ControllIcons";
 import { useClassContext } from "../../hooks/useClassContext";
+import KeynoteList from "../pages/keynote/Keynote";
 
 const ClassContainerWrapper = styled.div`
   width: 66vw;
   height: 100%;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -19,17 +19,17 @@ export default function ClassContainer() {
 
   return (
     <ClassContainerWrapper>
-      {activeClass &&
+      {activeClass && (
         <ControlIcons
           isPresenting={isPresenting}
           isEditing={isEditing}
           isSharing={false}
           handlePresenting={() => handlePresent()}
           handleEditing={() => handleEdit()}
-          handleSharing={() => { }}
+          handleSharing={() => {}}
         />
-      }
-      ClassContainer
+      )}
+      <KeynoteList />
     </ClassContainerWrapper>
   );
 }

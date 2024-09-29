@@ -1,9 +1,9 @@
 import React from "react";
 import { styled } from "styled-components";
 import ClassEntity from "../ClassEntity";
-import { listOfClasses } from "./ClassList.mock";
 import { useClassContext } from "../../../hooks/useClassContext";
 
+// Styling for the class list wrapper
 const ClassListWrapper = styled.div`
   width: 33vw;
   max-height: 100%;
@@ -17,15 +17,25 @@ const ClassListWrapper = styled.div`
   filter: drop-shadow(3px 0px 12px #e029d19b);
 `;
 
-export default function ClassList() {
+// Define the type for the classes prop
+interface ClassListProps {
+  classes: Array<{
+    class_name: string | undefined;
+    id: string;
+    name: string;
+    description?: string;
+  }>;
+}
+
+export default function ClassList({ classes }: ClassListProps) {
   const { activeClass, setActiveClass } = useClassContext();
 
   return (
     <ClassListWrapper>
-      {listOfClasses.map((classItem) => (
+      {classes.map((classItem) => (
         <ClassEntity
           key={classItem.id}
-          name={classItem.name}
+          name={classItem.class_name}
           description={classItem.description}
           isActive={activeClass === classItem.name}
           onClick={() => setActiveClass(classItem.name)}
