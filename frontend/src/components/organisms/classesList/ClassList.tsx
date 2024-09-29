@@ -28,7 +28,7 @@ interface ClassListProps {
 }
 
 export default function ClassList({ classes }: ClassListProps) {
-  const { activeClass, setActiveClass } = useClassContext();
+  const { activeClass, setActiveClassWrapper } = useClassContext();
 
   return (
     <ClassListWrapper>
@@ -37,8 +37,8 @@ export default function ClassList({ classes }: ClassListProps) {
           key={classItem.id}
           name={classItem.class_name}
           description={classItem.description}
-          isActive={activeClass === classItem.name}
-          onClick={() => setActiveClass(classItem.name)}
+          isActive={classItem.class_name === activeClass}
+          onClick={() => setActiveClassWrapper(classItem.class_name)}
         />
       ))}
     </ClassListWrapper>

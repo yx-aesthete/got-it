@@ -9,7 +9,7 @@ import {
 const KeynoteEntityWrapper = styled.div<{
   isActive: boolean;
   height: number;
-  isOdd: boolean;
+  isodd: boolean;
 }>`
   transition: all 0.3s ease-in-out;
   display: flex;
@@ -19,7 +19,7 @@ const KeynoteEntityWrapper = styled.div<{
     props.isActive
       ? props.theme.colors.pinkLight
       : props.theme.colors.pinkDark};
-  opacity: ${(props) => (props.isOdd ? 0.8 : 1)};
+  opacity: ${(props) => (props.isodd ? 0.8 : 1)};
   padding: 12px;
   position: relative;
   overflow: hidden;
@@ -37,7 +37,7 @@ interface KeynoteEntityProps {
   title: string;
   isActive: boolean;
   height: number;
-  isOdd: boolean;
+  isodd: boolean;
   index: number;
 }
 
@@ -45,12 +45,11 @@ const KeynoteEntity: React.FC<KeynoteEntityProps> = ({
   title,
   isActive,
   height,
-  isOdd,
+  isodd,
   index,
 }) => {
-  console.log(height);
   return (
-    <KeynoteEntityWrapper isOdd={isOdd} isActive={isActive} height={height}>
+    <KeynoteEntityWrapper isodd={isodd} isActive={isActive} height={height}>
       <ContentWrapper>
         <Typography
           animated
